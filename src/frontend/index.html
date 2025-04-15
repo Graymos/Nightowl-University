@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Night Owl University</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <!-- Update path to logo image -->
+                <img src="../../images/transparent.png" alt="Night Owl University Logo"
+                    style="height:72px; border-radius:5px; padding:0 12px;" />
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto" style="font-size: 24px;">
+                    <li class="nav-item mx-2">
+                        <a class="nav-link" id="nav-link-home" href="#">Home</a>
+                    </li>
+                    <li class="nav-item mx-2">
+                        <a class="nav-link" href="#">Student</a>
+                    </li>
+                    <li class="nav-item mx-2">
+                        <a class="nav-link" href="#">Faculty</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav" style="font-size: 20px;">
+                    <li class="nav-item mx-2">
+                        <a class="nav-link" onclick="navigateToSection('formStudent')" href="#">Apply</a>
+                    </li>
+                    <li class="nav-item mx-2">
+                        <a class="nav-link" href="#">Donate</a>
+                    </li>
+                    <li class="nav-item mx-2">
+                        <a class="nav-link" href="#">Visit</a>
+                    </li>
+                </ul>
+                <button class="btn btn-outline-primary" id="nav-express"
+                    onclick="navigateToSection('formLogin')">Express</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section with Parallax Background -->
+    <section class="hero">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <div class="bubble">
+                <h1>Welcome to Night Owl University</h1>
+                <p>Your Future Starts Here</p>
+                <button class="btn btn-success btn-lg" onclick="navigateToSection('formStudent')">Apply Now</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section (Full-Screen, Compact) -->
+    <section class="full-screen-section features-section" id="features-section">
+        <div class="container text-center">
+            <h2 class="section-title">Discover Night Owl University</h2>
+            <div class="row mt-4">
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <i class="bi bi-pencil-square"></i>
+                        <h3>Apply</h3>
+                        <p>Join our vibrant community of learners and start your journey today.</p>
+                        <button class="btn btn-primary" onclick="navigateToSection('formStudent')">Apply Now</button>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <i class="bi bi-geo-alt"></i>
+                        <h3>Visit</h3>
+                        <p>Explore our campus and see our state-of-the-art facilities.</p>
+                        <button class="btn btn-primary">Schedule a Visit</button>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <i class="bi bi-book"></i>
+                        <h3>Majors</h3>
+                        <p>Discover programs designed to launch your career and transform your future.</p>
+                        <button class="btn btn-primary">Learn More</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Registration Section (Full-Screen, Compact) -->
+    <section class="full-screen-section registration-section" id="registration-section">
+        <div class="container">
+            <div class="registration-post p-4 rounded shadow">
+                <h2>Registration is Now Open!</h2>
+                <p>
+                    At Night Owl University, we’re committed to providing an enriching academic and social experience.
+                    Whether you’re a first-year student or transferring in, orientation is your first step in joining
+                    our community.
+                </p>
+                <button class="btn btn-success btn-lg" onclick="navigateToSection('formStudent')">Register
+                    Today</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Campus Tours Section (Full-Screen, Compact) -->
+    <section class="full-screen-section tours-section" id="tours-section">
+        <div class="container">
+            <div class="tours-post p-4 rounded shadow">
+                <h2>Campus Tours Now in Session!</h2>
+                <p>
+                    Join us for a personalized campus tour tailored for busy professionals and night owls.
+                    Experience our facilities and get a real feel for campus life.
+                </p>
+                <button class="btn btn-success btn-lg" onclick="navigateToSection('formStudent')">Book a Tour</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Insights Section (Filler Content with Alternating Colors) -->
+    <section class="full-screen-section insights-section" id="insights-section">
+        <div class="container">
+            <h2 class="section-title text-center mb-4">Latest Insights</h2>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="insight-card">
+                        <h3>Latest News</h3>
+                        <p>Stay updated with the latest happenings and developments at Night Owl University.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="insight-card alt">
+                        <h3>Student Spotlight</h3>
+                        <p>Read inspiring stories of our standout students making a difference.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="insight-card">
+                        <h3>Upcoming Events</h3>
+                        <p>Join us for events, workshops, and webinars designed to spark creativity and innovation.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Registration, Login, and Faculty Forms Section (Hidden by Default) -->
+    <section class="container my-5" id="forms-section" style="display: none;">
+        <!-- Student Registration Form -->
+        <form id="formStudent" class="card p-4 mb-5">
+            <h2 class="text-center mb-3" style="color: #2c3e50;">Register Student</h2>
+            <input id="txtStudentFirstname" class="form-control mt-2" type="text" placeholder="First Name" />
+            <input id="txtStudentMiddlename" class="form-control mt-2" type="text" placeholder="Middle Name" />
+            <input id="txtStudentLastname" class="form-control mt-2" type="text" placeholder="Last Name" />
+            <input id="txtStudentEmail" class="form-control mt-2" type="email" placeholder="Email" />
+            <input id="txtStudentPassword" class="form-control mt-2" type="password" placeholder="Password" />
+            <input id="txtStudentPasswordConfirm" class="form-control mt-2" type="password"
+                placeholder="Confirm Password" />
+            <input id="txtStudentPhoneNumber" class="form-control mt-2" type="tel" placeholder="Phone Number" />
+            <button id="btnStudentRegisterSubmit" type="button" class="btn btn-success col-12 mt-3">
+                Register
+            </button>
+            <hr />
+            <div class="text-center">
+                <p>Already registered?</p>
+                <button id="btnShowLogin" type="button" class="btn btn-link">
+                    Login here
+                </button>
+            </div>
+        </form>
+        <!-- Student Login Form -->
+        <form id="formLogin" class="card p-4 mb-5" style="display: none;">
+            <h2 class="text-center mb-3" style="color: #2c3e50;">Express Login</h2>
+            <input id="txtStudentLoginEmail" class="form-control mt-2" type="email" placeholder="Email" />
+            <input id="txtStudentLoginPassword" class="form-control mt-2" type="password" placeholder="Password" />
+            <button id="btnStudentLoginSubmit" type="button" class="btn btn-primary col-12 mt-3">
+                Login
+            </button>
+            <hr />
+            <div class="text-center">
+                <p>Don't have an account?</p>
+                <button id="btnShowRegister" type="button" class="btn btn-link">
+                    Create one here
+                </button>
+                <p>Faculty?</p>
+                <button id="btnShowRegisterFaculty" type="button" class="btn btn-link">
+                    Register for Faculty
+                </button>
+            </div>
+        </form>
+        <!-- Faculty Registration Form -->
+        <form id="formFaculty" class="card p-4 mb-5" style="display: none;">
+            <h2 class="text-center mb-3" style="color: #2c3e50;">Register Faculty</h2>
+            <input id="txtFacultyFirstname" class="form-control mt-2" type="text" placeholder="First Name" />
+            <input id="txtFacultyLastname" class="form-control mt-2" type="text" placeholder="Last Name" />
+            <input id="txtFacultyUsername" class="form-control mt-2" type="email" placeholder="Email" />
+            <input id="txtFacultyPassword" class="form-control mt-2" type="password" placeholder="Password" />
+            <input id="txtFacultyPasswordConfirm" class="form-control mt-2" type="password"
+                placeholder="Confirm Password" />
+            <button id="btnRegisterFacultySubmit" type="button" class="btn btn-success col-12 mt-3">
+                Register for Faculty
+            </button>
+        </form>
+    </section>
+
+    <!-- Reference External JavaScript (located in src/backend/scripts.js) -->
+    <script src="../backend/scripts.js"></script>
+</body>
+
+</html>

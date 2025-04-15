@@ -1,0 +1,222 @@
+/* Global Resets */
+html,
+body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    font-family: Arial, sans-serif;
+}
+
+/* Navbar Styling */
+.navbar {
+    background: linear-gradient(145deg, rgba(171, 146, 102, 0.75) 4%, rgba(185, 185, 185, 0.75) 86%);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    box-shadow: 0px 1px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* Hero Section with Parallax Background */
+.hero {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    /* Updated background image path */
+    background-image: url('../../images/tntech-night.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.hero-content {
+    position: absolute;
+    bottom: 15%;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    width: 90%;
+    max-width: 600px;
+}
+
+.bubble {
+    background: linear-gradient(145deg, rgba(171, 146, 102, 0.75) 4%, rgba(185, 185, 185, 0.75) 86%);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(0,0,0,0.35);
+    border-radius: 15px;
+    padding: 20px;
+    display: inline-block;
+}
+
+.hero-content h1 {
+    font-size: 3em;
+    margin-bottom: 0.5em;
+    color: #333;
+}
+
+.hero-content p {
+    font-size: 1.5em;
+    margin-bottom: 1em;
+    color: #333;
+}
+
+/* Full-screen Section Base Style (More Compact) */
+.full-screen-section {
+    min-height: 70vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 0;
+}
+
+/* Features Section */
+.features-section {
+    background: #f7f7f7;
+}
+
+.features-section .section-title {
+    font-size: 2.5em;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.feature-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 10px 0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    text-align: center;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+}
+
+.feature-card i {
+    font-size: 3em;
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+.feature-card h3 {
+    margin-top: 10px;
+    margin-bottom: 15px;
+    color: #2c3e50;
+}
+
+.feature-card p {
+    color: #555;
+}
+
+.feature-card .btn {
+    margin-top: 15px;
+}
+
+/* Registration Section */
+.registration-section {
+    background: #fff;
+}
+
+.registration-post {
+    background: #fff;
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.registration-post h2 {
+    margin-bottom: 15px;
+    color: #2c3e50;
+}
+
+.registration-post p {
+    color: #555;
+    font-size: 1.1em;
+    margin-bottom: 20px;
+}
+
+/* Tours Section */
+.tours-section {
+    background: #f7f7f7;
+}
+
+.tours-post {
+    background: #fff;
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.tours-post h2 {
+    margin-bottom: 15px;
+    color: #2c3e50;
+}
+
+.tours-post p {
+    color: #555;
+    font-size: 1.1em;
+    margin-bottom: 20px;
+}
+
+/* Insights Section with Alternating Card Colors */
+.insights-section {
+    background: #fff;
+}
+
+.insights-section .section-title {
+    font-size: 2.5em;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.insight-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 10px 0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.insight-card.alt {
+    background: #f7f7f7;
+}
+
+.insight-card h3 {
+    margin-bottom: 10px;
+    color: #2c3e50;
+}
+
+.insight-card p {
+    color: #555;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .hero-content h1 {
+        font-size: 2em;
+    }
+
+    .hero-content p {
+        font-size: 1.2em;
+    }
+
+    .feature-card {
+        padding: 15px;
+    }
+
+    .feature-card i {
+        font-size: 2.5em;
+    }
+}

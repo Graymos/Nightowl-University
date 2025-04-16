@@ -1,222 +1,345 @@
 /* Global Resets */
 html,
 body {
-    margin: 0;
-    padding: 0;
-    overflow-x: hidden;
-    font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  font-family: Arial, sans-serif;
 }
 
 /* Navbar Styling */
 .navbar {
-    background: linear-gradient(145deg, rgba(171, 146, 102, 0.75) 4%, rgba(185, 185, 185, 0.75) 86%);
-    -webkit-backdrop-filter: blur(20px);
-    backdrop-filter: blur(20px);
-    box-shadow: 0px 1px 10px rgba(0, 0, 0, 0.15);
+  background: linear-gradient(145deg, rgba(171,146,102,0.75) 4%, rgba(185,185,185,0.75) 86%);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  box-shadow: 0px 1px 10px rgba(0,0,0,0.15);
+  padding: 10px 20px;
+}
+.navbar .nav-link {
+  transition: color 0.2s ease, background-color 0.2s ease;
+  padding: 8px 12px;
+  margin: 0 5px;
+}
+.navbar .nav-link:hover {
+  color: #470B60;
+  background-color: rgba(71,11,150,0.1);
+  border-radius: 5px;
 }
 
 /* Hero Section with Parallax Background */
 .hero {
-    position: relative;
-    width: 100%;
-    height: 100vh;
-    /* Updated background image path */
-    background-image: url('../../images/tntech-night.jpg');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background-image: url('../../images/tntech-night.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-
 .hero-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.4);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
 }
 
+/* Updated Hero Content Layout with Two Columns, No Gutter, & Vertical Centering */
 .hero-content {
-    position: absolute;
-    bottom: 15%;
-    left: 50%;
-    transform: translateX(-50%);
-    text-align: center;
-    width: 90%;
-    max-width: 600px;
+  position: relative;
+  width: 100%;
+  padding: 20px;
+}
+.row.align-items-center.g-0 {
+  gap: 0;
 }
 
-.bubble {
-    background: linear-gradient(145deg, rgba(171, 146, 102, 0.75) 4%, rgba(185, 185, 185, 0.75) 86%);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(0,0,0,0.35);
-    border-radius: 15px;
-    padding: 20px;
-    display: inline-block;
+/* Hero Left: Bigger, Bolder */
+.hero-left {
+  text-align: left;
+  color: #fff;
+  margin-top: 80px;
+  text-shadow: 0px 2px 8px rgba(0, 0, 0, 0.25);
+}
+.hero-left h1 {
+  font-size: 4.5em;
+  font-weight: bold;
+  margin-bottom: 0.3em;
+}
+.hero-left h2 {
+  font-size: 3em;
+  font-weight: bold;
 }
 
-.hero-content h1 {
-    font-size: 3em;
-    margin-bottom: 0.5em;
-    color: #333;
+/* Signup Box (Right Column): Skinnier & Taller */
+.signup-box {
+  background: rgba(0,0,0,0.3);
+  backdrop-filter: blur(20px);
+  border-radius: 5px;
+  padding: 30px 20px;
+  color: #fff;
+  max-width: 280px;
+  margin: 20px auto;
+  box-shadow: 0px 2px 8px 0px rgba(0,0,0,0.25);
+}
+.signup-box h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+.signup-box p {
+  margin-bottom: 10px;
+}
+.separator {
+  border: none;
+  height: 2px;
+  background-color: rgba(255,255,255,0.25);
+  margin: 10px 0;
+}
+.signup-btn {
+  background-color: rgba(171,146,102,1);
+  color: #000;
+  border: none;
+  padding: 10px 20px;
+  font-size: 1.1em;
+  border-radius: 5px;
+  transition: all 0.3s ease;
+  margin-top: 8px;
+}
+.signup-btn:hover {
+  opacity: 0.6;
+  background: rgba(171,146,102,1);
+  color: #000;
 }
 
-.hero-content p {
-    font-size: 1.5em;
-    margin-bottom: 1em;
-    color: #333;
-}
-
-/* Full-screen Section Base Style (More Compact) */
+/* Full-Screen Section Base Style (More Compact) */
 .full-screen-section {
-    min-height: 70vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 30px 0;
+  min-height: 70vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 0;
 }
 
-/* Features Section */
-.features-section {
-    background: #f7f7f7;
+/* Content Block for Sections (75% width, centered) */
+.content-block {
+  position: relative;
+  width: 75%;
+  margin: 0 auto;
+  text-align: center;
 }
 
-.features-section .section-title {
-    font-size: 2.5em;
-    margin-bottom: 20px;
-    color: #333;
+/* FEATURES SECTION: Owl & Content Combined in Flexbox */
+.features-flex {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  width: 100%;
+  height: 100%;
+}
+.owl-container {
+  flex: 0 0 auto;
+  margin-right: 64px;
+  margin-bottom: 64px;
+  display: flex;
+  align-items: flex-end;
+}
+.owl-svg {
+  width: 256px;
+  height: auto;
+  /* Tint the owl to our gold color (#ab9266) if needed */
+}
+.content-inner {
+  flex: 1;
+  text-align: left;
+}
+.content-inner .section-title {
+  color: #ab9266; /* Gold color */
 }
 
-.feature-card {
-    background: #fff;
-    border-radius: 10px;
-    padding: 20px;
-    margin: 10px 0;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease;
-    text-align: center;
+/* Learn More Link */
+.learn-more {
+  display: inline-block;
+  margin-top: 15px;
+  color: #ab9266;
+  text-decoration: underline;
+  font-size: 1.1em;
+  transition: color 0.3s ease;
+}
+.learn-more:hover {
+  color: #470B60;
 }
 
-.feature-card:hover {
-    transform: translateY(-5px);
+/* Custom Feature Button */
+.btn-feature {
+  background-color: #470B60;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 12px 24px;
+  font-size: 1.2em;
+  transition: background-color 0.3s;
+  margin-top: 15px;
+}
+.btn-feature:hover {
+  background-color: #360848;
 }
 
-.feature-card i {
-    font-size: 3em;
-    color: #2c3e50;
-    margin-bottom: 10px;
+/* EVENT SECTION: Lighting The Quad */
+/* Span full viewport width and use flex for 60/40 layout, with image touching the screen’s right edge */
+.event-section {
+  width: 100vw;
+  overflow: hidden;
+  background: #1a1a1a;
+  padding: 0;
+}
+.event-flex {
+  display: flex;
+  width: 100vw;
+  height: 70vh;
+  background-size: cover;
+}
+.event-content {
+  flex: 0 0 40%;
+  padding: 80px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background-color: #470B60;
+}
+.event-content .section-title {
+  font-size: 2.5em;
+  margin-bottom: 20px;
+  color: #ab9266;
+}
+.event-content p {
+  font-size: 1.4em;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+.event-content .learn-more {
+  display: inline-block;
+  margin-top: 15px;
+  color: #ab9266;
+  text-decoration: underline;
+  font-size: 1.1em;
+  transition: color 0.3s ease;
+}
+.event-content .learn-more:hover {
+  color: #470B60;
+}
+.event-image {
+  flex: 0 0 60%;
+  background: url('../../images/lighting-quad.jpg') no-repeat right center;
+  background-size: cover;
+  min-height: 70vh;
 }
 
-.feature-card h3 {
-    margin-top: 10px;
-    margin-bottom: 15px;
-    color: #2c3e50;
+/* REGISTRATION, TOURS, INSIGHTS SECTIONS */
+.light-dark-section {
+  background: #2a2a2a;
+  color: #f5f5f5;
+}
+.dark-section {
+  background: #1a1a1a;
+  color: #f5f5f5;
 }
 
-.feature-card p {
-    color: #555;
+/* Section Titles */
+.section-title {
+  font-size: 3em;
+  margin-bottom: 20px;
 }
 
-.feature-card .btn {
-    margin-top: 15px;
-}
-
-/* Registration Section */
-.registration-section {
-    background: #fff;
-}
-
-.registration-post {
-    background: #fff;
-    border-radius: 10px;
-    padding: 30px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    text-align: center;
-}
-
-.registration-post h2 {
-    margin-bottom: 15px;
-    color: #2c3e50;
-}
-
-.registration-post p {
-    color: #555;
-    font-size: 1.1em;
-    margin-bottom: 20px;
-}
-
-/* Tours Section */
-.tours-section {
-    background: #f7f7f7;
-}
-
-.tours-post {
-    background: #fff;
-    border-radius: 10px;
-    padding: 30px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    text-align: center;
-}
-
-.tours-post h2 {
-    margin-bottom: 15px;
-    color: #2c3e50;
-}
-
-.tours-post p {
-    color: #555;
-    font-size: 1.1em;
-    margin-bottom: 20px;
-}
-
-/* Insights Section with Alternating Card Colors */
-.insights-section {
-    background: #fff;
-}
-
-.insights-section .section-title {
-    font-size: 2.5em;
-    margin-bottom: 20px;
-    color: #333;
-}
-
-.insight-card {
-    background: #fff;
-    border-radius: 10px;
-    padding: 20px;
-    margin: 10px 0;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    text-align: center;
-}
-
-.insight-card.alt {
-    background: #f7f7f7;
-}
-
-.insight-card h3 {
-    margin-bottom: 10px;
-    color: #2c3e50;
-}
-
-.insight-card p {
-    color: #555;
+/* Paragraphs */
+.full-screen-section p {
+  font-size: 1.1em;
+  line-height: 1.6;
+  margin-bottom: 20px;
 }
 
 /* Responsive Adjustments */
 @media (max-width: 768px) {
-    .hero-content h1 {
-        font-size: 2em;
-    }
+  .hero-left h1 {
+    font-size: 3em;
+  }
+  .hero-left h2 {
+    font-size: 2em;
+  }
+  .content-block {
+    width: 90%;
+  }
+  .hero-content {
+    padding-top: 120px;
+  }
+  /* Features Section: Stack the owl and content */
+  .features-flex {
+    flex-direction: column;
+    align-items: center;
+  }
+  .owl-container {
+    margin-right: 0;
+    margin-bottom: 10px;
+  }
+  .content-inner {
+    text-align: center;
+  }
+  /* Event Section: Stack columns vertically */
+  .event-flex {
+    flex-direction: column;
+    width: 100%;
+    height: auto;
+  }
+  .event-content,
+  .event-image {
+    flex: 0 0 100%;
+  }
+  .event-image {
+    min-height: 40vh;
+  }
+}
 
-    .hero-content p {
-        font-size: 1.2em;
-    }
+/* Footer Styles */
+.site-footer {
+  background-color: #000;
+  color: #ccc;
+  padding: 40px 0;
+  margin-top: 0;
+  text-align: center;
+}
+.site-footer h5 {
+  color: #ab9266;
+  margin-bottom: 20px;
+}
+.site-footer .footer-links {
+  list-style: none;
+  padding: 0;
+}
+.site-footer .footer-links li {
+  margin-bottom: 10px;
+}
+.site-footer .footer-links a {
+  color: #ccc;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+.site-footer .footer-links a:hover {
+  color: #ab9266;
+}
+.site-footer p {
+  margin-top: 20px;
+}
 
-    .feature-card {
-        padding: 15px;
-    }
-
-    .feature-card i {
-        font-size: 2.5em;
-    }
+/* Custom Bold Font */
+.boldFont {
+  font-family: "Special Gothic Expanded One", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+.gold {
+  color: #ab9266;
 }

@@ -39,10 +39,10 @@
             <a class="nav-link" id="nav-link-home" href="#">Home</a>
           </li>
           <li class="nav-item mx-2">
-            <a class="nav-link" href="#">Student</a>
+            <a class="nav-link" id="nav-student" href="#">Student</a>
           </li>
           <li class="nav-item mx-2">
-            <a class="nav-link" href="#">Faculty</a>
+            <a class="nav-link" id="nav-faculty" href="#">Faculty</a>
           </li>
         </ul>
         <ul class="navbar-nav" style="font-size: 20px;">
@@ -56,9 +56,14 @@
             <a class="nav-link" href="#">Visit</a>
           </li>
         </ul>
-        <button class="btn btn-outline-primary" id="nav-express" onclick="navigateToSection('formLogin')">
-          Express
-        </button>
+        <div class="btn-group" role="group" aria-label="Basic example">
+          <button class="btn btn-primary mx-1" id="nav-login">
+            Login
+          </button>
+          <button class="btn btn-primary mx-1" id="nav-register">
+            Register
+          </button>
+        </div>
       </div>
     </div>
   </nav>
@@ -144,9 +149,9 @@
 
 
   <!-- Forms Section (Hidden by Default) -->
-  <section class="container my-5" id="forms-section" style="display: block; margin-top: 246px !important;">
+  <section class="container my-5" id="forms-section" style="display: none;">
     <!-- Student Registration Form -->
-    <form id="formStudent" class="card p-4 mb-5">
+    <form id="formStudent" class="card p-4 mb-5" style="display: none;">
       <h2 class="text-center mb-3" style="color: #2c3e50;">Register Student</h2>
       <input id="txtStudentFirstname" class="form-control mt-2" type="text" placeholder="First Name">
       <input id="txtStudentMiddlename" class="form-control mt-2" type="text" placeholder="Middle Name">
@@ -197,6 +202,34 @@
         <button id="btnShowLoginFaculty" type="button" class="btn btn-link">Login here</button>
       </div>
     </form>
+  </section>
+  <!-- Faculty Dashboard -->  
+  <section id="faculty-dashboard" style="display: none;  margin-top: 200px !important;">
+    <h2 class="text-center mb-2" style="color: #2c3e50;">Faculty Dashboard</h2>
+
+    <div class="container p-3">
+      <p class="text-center">Here you can manage your courses, view student progress, and more.</p>
+      <div class="d-grid align-items-center mx-auto" style="max-width: 400px;">
+        <button id="btnManageCourses" type="button" class="btn btn-primary col-12 mt-3">Manage Courses</button>
+        <button id="btnManageReviews" type="button" class="btn btn-secondary col-12 mt-3">Manage Reviews</button>
+        <button id="btnManageReports" type="button" class="btn btn-info col-12 mt-3">Manage Reports</button>
+        <button id="btnFacultyLogout" type="button" class="btn btn-danger col-12 mt-3">Logout</button>
+
+      </div>
+    </div>
+  </section>
+  <!-- Student Dashboard -->
+  <section id="student-dashboard" style="display: none;  margin-top: 200px !important;">
+    <h2 class="text-center mb-2" style="color: #2c3e50;">Student Dashboard</h2>
+
+    <div class="container p-3">
+      <p class="text-center">Here you can manage your reviews, view feedback, and more.</p>
+      <div class="d-grid align-items-center mx-auto" style="max-width: 400px;">
+        <button id="btnManageReviewsStudent" type="button" class="btn btn-primary col-12 mt-3">Manage Reviews</button>
+        <button id="btnViewFeedback" type="button" class="btn btn-secondary col-12 mt-3">View Feedback</button>
+        <button id="btnStudentLogout" type="button" class="btn btn-danger col-12 mt-3">Logout</button>
+      </div>
+    </div>
   </section>
 
   <div class="register-view">

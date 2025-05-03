@@ -14,8 +14,6 @@ router.post('/register/student', async (req, res) => {
     const existingUser = await User.findByEmail(email);
     if (existingUser) {
       return res.status(400).json({ message: 'User with this email already exists' });
-
-module.exports = router;
     }
 
     // Hash password
@@ -170,3 +168,5 @@ router.get('/profile', authenticate, async (req, res) => {
     res.status(500).json({ message: 'Error fetching profile', error: error.message });
   }
 });
+
+module.exports = router;

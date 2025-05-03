@@ -1,33 +1,25 @@
 // Main Express server setup
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
-const { setupDatabase } = require('./config/database');
+const bodyParser = require('body-parser');
 
-// Initialize express app
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = 3001;
 
-// Middleware
 app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
-// Serve static frontend files
-app.use(express.static(path.join(__dirname, '../frontend')));
+// Use the users router for all user-related endpoints
+const usersRouter = require('./routes/users');
+app.use('/api/users', usersRouter);
 
-// Import and use routes
-const routes = require('./routes');
-app.use('/api', routes);
+// You can add other routers here as needed, e.g. courses, reviews, etc.
 
-// Fallback route for SPA
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/index.html'));
+// Optionally, a root endpoint for health check
+app.get('/', (req, res) => {
+  res.send('NightOwl University backend is running.');
 });
 
-// Start the server
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  // Initialize database
-  setupDatabase();
+  console.log(`Backend running on http://localhost:${PORT}`);
 });

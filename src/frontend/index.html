@@ -149,7 +149,7 @@
 
 
   <!-- Forms Section (Hidden by Default) -->
-  <section class="container my-5" id="forms-section" style="display: none;">
+  <section class="container my-5" id="forms-section" style="display: none; margin-top: 150px !important;">
     <!-- Student Registration Form -->
     <form id="formStudent" class="card p-4 mb-5" style="display: none;">
       <h2 class="text-center mb-3" style="color: #2c3e50;">Register Student</h2>
@@ -170,7 +170,7 @@
       </div>
     </form>
     <!-- Student Login Form -->
-    <form id="formLogin" class="card p-4 mb-5" style="display: none;">
+    <form id="formLogin" class="card p-4 mb-5" style="display: none; margin-top: 150px !important;">
       <h2 class="text-center mb-3" style="color: #2c3e50;">Express Login</h2>
       <input id="txtStudentLoginEmail" class="form-control mt-2" type="email" placeholder="Email">
       <input id="txtStudentLoginPassword" class="form-control mt-2" type="password" placeholder="Password">
@@ -186,7 +186,7 @@
       </div>
     </form>
     <!-- Faculty Registration Form -->
-    <form id="formFaculty" class="card p-4 mb-5" style="display: none;">
+    <form id="formFaculty" class="card p-4 mb-5" style="display: none; margin-top: 150px !important;">
       <h2 class="text-center mb-3" style="color: #2c3e50;">Register Faculty</h2>
       <input id="txtFacultyFirstname" class="form-control mt-2" type="text" placeholder="First Name">
       <input id="txtFacultyLastname" class="form-control mt-2" type="text" placeholder="Last Name">
@@ -204,7 +204,7 @@
     </form>
   </section>
   <!-- Faculty Dashboard -->  
-  <section id="faculty-dashboard" style="display: none;  margin-top: 200px !important;">
+  <section id="faculty-dashboard" style="display: none;  margin-top: 150px !important;">
     <h2 class="text-center mb-2" style="color: #2c3e50;">Faculty Dashboard</h2>
 
     <div class="container p-3">
@@ -218,8 +218,71 @@
       </div>
     </div>
   </section>
+
+  <section id="manage-courses" style="display: none;  margin-top: 150px !important;">
+    <h2 class="text-center mb-2" style="color: #2c3e50;">Manage Courses</h2>
+
+    <div class="container p-3">
+      <form id="frmCourse" aria-label="Create course form" style="display: block;">
+        <div class="mb-3">
+            <label for="txtCourseName" class="form-label">Course Name</label>
+            <input type="text" id="txtCourseName" class="form-control" placeholder="e.g., CSC3100" aria-required="true">
+        </div>
+
+        <div class="mb-3">
+            <label for="txtCourseCode" class="form-label">Course Code</label>
+            <input type="text" id="txtCourseCode" class="form-control" placeholder="e.g., 3100-F23" aria-required="true">
+        </div>
+
+        <button class="btn btn-primary mb-2" type="submit" aria-label="Create course button">Create Course</button>
+      </form>
+    </div> 
+  
+  </section>
+
+  <section id="manage-reviews" style="display: none;  margin-top: 150px !important;">
+    <h2 class="mb-2" style="color: #2c3e50;">Create Reviews</h2>
+    <p>Use the form below to create a new review.</p>
+
+    <form id="frmCreateReview" aria-label="Create review form">
+      <div class="mb-3">
+          <label for="txtReviewTitle" class="form-label">Review Title</label>
+          <input type="text" id="txtReviewTitle" class="form-control" placeholder="e.g., Great Course!" aria-required="true">
+      </div>
+
+      <div class="mb-3">
+          <label for="txtReviewContent" class="form-label">Review Content</label>
+          <textarea id="txtReviewContent" class="form-control" rows="4" placeholder="Write your review here..." aria-required="true"></textarea>
+      </div>
+
+      <button class="btn btn-primary mb-2" type="submit" aria-label="Create review button">Create Review</button>
+    </form>
+
+    <h2 class="mt-2">Schedule Review</h2>
+    <p class="mb-4">Set a start and end date for a review session.</p>
+
+    <form id="frmScheduleReview" aria-label="Schedule review form">
+        <div class="mb-3">
+          <label for="dtStart" class="form-label">Start Date</label>
+          <input type="date" class="form-control" id="dtStart">
+        </div>
+
+        <div class="mb-3">
+            <label for="dtEnd" class="form-label">End Date</label>
+            <input type="date" class="form-control" id="dtEnd">
+        </div>
+
+        <div class="mb-3">
+            <label for="txtReviewCode" class="form-label">Course to Schedule For</label>
+            <input type="text" id="txtReviewCode" class="form-control" placeholder="e.g., 3100-F23" aria-required="true">
+        </div>
+
+        <button class="btn btn-primary" type="submit" aria-label="Schedule review button">Schedule</button>
+    </form>
+
+  </section>
   <!-- Student Dashboard -->
-  <section id="student-dashboard" style="display: none;  margin-top: 200px !important;">
+  <section id="student-dashboard" style="display: none;  margin-top: 150px !important;">
     <h2 class="text-center mb-2" style="color: #2c3e50;">Student Dashboard</h2>
 
     <div class="container p-3">

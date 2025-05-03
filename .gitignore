@@ -1,0 +1,27 @@
+# Ignore Node.js dependencies
+node_modules/
+
+# Ignore Cursor AI configuration and rules
+.cursor/
+
+# Ignore environment variable files
+.env
+
+# Ignore log files
+*.log
+
+# Ignore OS generated files
+.DS_Store
+Thumbs.db
+
+# Ignore build output
+dist/
+build/
+
+# Ignore coverage reports
+coverage/
+
+# Ignore IDE/editor settings
+.vscode/
+.idea/
+*.swp

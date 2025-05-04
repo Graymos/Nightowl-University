@@ -228,4 +228,6 @@ document.addEventListener('DOMContentLoaded', function() {
   
     // Check auth status on page load
     checkAuth();
+
+
   });

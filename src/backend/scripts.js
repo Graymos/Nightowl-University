@@ -83,6 +83,7 @@ document.addEventListener('DOMContentLoaded', function () {
       document.getElementById('formLogin').style.display = 'none';
       document.getElementById('formFaculty').style.display = 'none';
   });
+  // Faculty Dashboard Navigation
   document.getElementById('nav-faculty').addEventListener('click', function (event) {
       event.preventDefault();
       document.querySelectorAll('section, form').forEach(el => {
@@ -90,6 +91,7 @@ document.addEventListener('DOMContentLoaded', function () {
       });
       document.getElementById('faculty-dashboard').style.display = 'block';
   });
+  // Student Dashboard Navigation
   document.getElementById('nav-student').addEventListener('click', function (event) {
       event.preventDefault();
       document.querySelectorAll('section, form').forEach(el => {
@@ -97,6 +99,7 @@ document.addEventListener('DOMContentLoaded', function () {
       });
       document.getElementById('student-dashboard').style.display = 'block';
   });
+  // Faculty Manage Courses Navigation
   document.getElementById('btnManageCourses').addEventListener('click', function (event) {
       event.preventDefault();
       document.querySelectorAll('section, form').forEach(el => {
@@ -106,6 +109,7 @@ document.addEventListener('DOMContentLoaded', function () {
       document.getElementById('frmCourse').style.display = 'block';
 
   });
+  // Faculty Manage Reviews Navigation
   document.getElementById('btnManageReviews').addEventListener('click', function (event) {
       event.preventDefault();
       document.querySelectorAll('section, form').forEach(el => {
@@ -116,6 +120,38 @@ document.addEventListener('DOMContentLoaded', function () {
       document.getElementById('frmScheduleReview').style.display = 'block';
 
   });
+  // Faculty Manage Reports Navigation
+  document.getElementById('btnManageReports').addEventListener('click', function (event) {
+      event.preventDefault();
+      document.querySelectorAll('section, form').forEach(el => {
+          el.style.display = 'none';
+      });
+      document.getElementById('manage-reports').style.display = 'block';
+      document.getElementById('frmReport').style.display = 'block';
+
+  });
+  // Student Manage Reviews Navigation
+  document.getElementById('btnManageReviewsStudent').addEventListener('click', function (event) {
+      event.preventDefault();
+      document.querySelectorAll('section, form').forEach(el => {
+          el.style.display = 'none';
+      });
+      document.getElementById('manage-reviews-student').style.display = 'block';
+      document.getElementById('frmReviewStudent').style.display = 'block';
+  });
+
+  function loadPendingReviews() {
+    const pendingReviews = []; // Replace with actual data fetching logic
+    // pull pending reviews from the DB
+    const tbody = document.getElementById('tblReviewsBody');
+    tbody.innerHTML = ''; // Clear existing rows
+
+    if (pendingReviews.length === 0) {
+      tbody.innerHTML = '<tr><td class="text-center" colspan="4">No pending reviews</td></tr>';
+      return;
+    }
+  }
+  loadPendingReviews();
 
   // --- JWT Authentication Functions ---
   function saveToken(token) {

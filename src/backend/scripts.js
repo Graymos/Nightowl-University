@@ -270,6 +270,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const email = document.getElementById('txtStudentLoginEmail').value.trim();
     const password = document.getElementById('txtStudentLoginPassword').value;
 
+    const navLoginButton = document.getElementById('nav-login');
+    const navRegisterButton = document.getElementById('nav-register');
+    const navLogoutButton = document.getElementById('nav-logout');
+
+
     let hasError = false;
     if (!email) {
       showFieldError('txtStudentLoginEmail', 'Email is required.');
@@ -289,8 +294,12 @@ document.addEventListener('DOMContentLoaded', function () {
       });
       const data = await res.json();
       if (res.ok) {
+
         Swal.fire('Success', `Login successful! Welcome, ${data.user.first_name}.`, 'success');
         // TODO: Show dashboard or next view
+        navLoginButton.style.display = 'none';
+        navRegisterButton.style.display = 'none';
+        navLogoutButton.style.display = 'block';
       } else {
         Swal.fire('Error', data.message || 'Login failed.', 'error');
       }

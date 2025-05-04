@@ -11,6 +11,16 @@ body {
   background: url('../../images/tntech-night-blur.jpg') center/cover no-repeat
 }
 
+.page-wrapper{
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;     /* ensures the wrapper is never shorter than screen   */
+}
+
+#view-container{
+  flex: 1 0 auto;        /* grow and shrink, but don’t force a fixed height    */
+}
+
 /* Navbar Styling */
 .navbar {
   background: linear-gradient(145deg, rgba(171,146,102,0.75) 4%, rgba(185,185,185,0.75) 86%);
@@ -317,6 +327,7 @@ body {
 
 /* Footer Styles */
 .site-footer {
+  flex-shrink: 0;
   background-color: #000;
   color: #ccc;
   padding: 40px 0;

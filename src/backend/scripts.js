@@ -152,37 +152,65 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let hasError = false;
 
+    // Helper to highlight fields
+    function highlightField(id) {
+      const el = document.getElementById(id);
+      if (el) el.classList.add('is-invalid');
+    }
+    function clearHighlight(id) {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('is-invalid');
+    }
+    ['txtStudentFirstname', 'txtStudentMiddlename', 'txtStudentLastname', 'txtStudentEmail', 'txtStudentPassword', 'txtStudentPasswordConfirm', 'txtStudentPhoneNumber'].forEach(clearHighlight);
+
     if (!first_name) {
       showFieldError('txtStudentFirstname', 'First name is required.');
+      highlightField('txtStudentFirstname');
       hasError = true;
     }
     if (!last_name) {
       showFieldError('txtStudentLastname', 'Last name is required.');
+      highlightField('txtStudentLastname');
       hasError = true;
     }
     if (!email) {
       showFieldError('txtStudentEmail', 'Email is required.');
+      highlightField('txtStudentEmail');
       hasError = true;
     } else if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
       showFieldError('txtStudentEmail', 'Please enter a valid email address.');
+      highlightField('txtStudentEmail');
       hasError = true;
     }
     if (!password) {
       showFieldError('txtStudentPassword', 'Password is required.');
+      highlightField('txtStudentPassword');
       hasError = true;
     } else if (password.length < 8) {
       showFieldError('txtStudentPassword', 'Password must be at least 8 characters.');
+      highlightField('txtStudentPassword');
       hasError = true;
     }
     if (!passwordConfirm) {
       showFieldError('txtStudentPasswordConfirm', 'Please confirm your password.');
+      highlightField('txtStudentPasswordConfirm');
       hasError = true;
     } else if (password !== passwordConfirm) {
       showFieldError('txtStudentPasswordConfirm', 'Passwords do not match.');
+      highlightField('txtStudentPasswordConfirm');
       hasError = true;
     }
 
     if (hasError) return;
+
+    // Disable button and show loading
+    const btn = document.getElementById('btnStudentRegisterSubmit');
+    btn.disabled = true;
+    const swalLoading = Swal.fire({
+      title: 'Registering...',
+      allowOutsideClick: false,
+      didOpen: () => { Swal.showLoading(); }
+    });
 
     try {
       const res = await fetch('http://localhost:3001/api/users/register/student', {
@@ -198,15 +226,38 @@ document.addEventListener('DOMContentLoaded', function () {
         })
       });
       const data = await res.json();
+      Swal.close();
+      btn.disabled = false;
       if (res.ok) {
-        Swal.fire('Success', 'Registration successful! You can now log in.', 'success');
-        document.getElementById('formStudent').style.display = 'none';
-        document.getElementById('formLogin').style.display = 'block';
+        await Swal.fire('Success', 'Registration successful! You can now log in.', 'success');
+        // Fade out register, fade in login
+        const regForm = document.getElementById('formStudent');
+        const loginForm = document.getElementById('formLogin');
+        regForm.classList.add('animate__animated', 'animate__fadeOut');
+        setTimeout(() => {
+          regForm.style.display = 'none';
+          regForm.classList.remove('animate__animated', 'animate__fadeOut');
+          loginForm.style.display = 'block';
+          loginForm.classList.add('animate__animated', 'animate__fadeIn');
+          setTimeout(() => {
+            loginForm.classList.remove('animate__animated', 'animate__fadeIn');
+          }, 800);
+        }, 800);
       } else {
-        Swal.fire('Error', data.message || 'Registration failed.', 'error');
+        // Show error and highlight field if possible
+        let errorField = null;
+        if (data.message && data.message.toLowerCase().includes('email')) errorField = 'txtStudentEmail';
+        if (errorField) {
+          highlightField(errorField);
+          showFieldError(errorField, data.message || 'Email error.');
+        } else {
+          await Swal.fire('Error', data.message || 'Registration failed.', 'error');
+        }
       }
     } catch (err) {
-      Swal.fire('Error', 'Registration failed. Please try again later.', 'error');
+      Swal.close();
+      btn.disabled = false;
+      await Swal.fire('Error', 'Registration failed. Please try again later.', 'error');
     }
   });
 

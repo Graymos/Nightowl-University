@@ -235,6 +235,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const password = document.getElementById('txtStudentPassword').value;
     const passwordConfirm = document.getElementById('txtStudentPasswordConfirm').value;
     const phone_number = document.getElementById('txtStudentPhoneNumber').value.trim();
+    const userType = document.getElementById('selUserType').value;
 
     let hasError = false;
 
@@ -286,6 +287,11 @@ document.addEventListener('DOMContentLoaded', function () {
       highlightField('txtStudentPasswordConfirm');
       hasError = true;
     }
+    if (!userType) {
+      showFieldError('selUserType', 'Please select a role.');
+      highlightField('selUserType');
+      hasError = true;
+    }
 
     if (hasError) return;
 
@@ -299,7 +305,12 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     try {
-      const res = await fetch('http://localhost:3001/api/users/register/student', {
+      // Choose endpoint based on user type
+      const endpoint = userType === 'faculty' 
+        ? 'http://localhost:3001/api/users/register/faculty' 
+        : 'http://localhost:3001/api/users/register/student';
+      
+      const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

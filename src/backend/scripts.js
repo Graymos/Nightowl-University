@@ -86,10 +86,30 @@ document.addEventListener('DOMContentLoaded', function () {
   // Faculty Dashboard Navigation
   document.getElementById('nav-faculty').addEventListener('click', function (event) {
       event.preventDefault();
-      document.querySelectorAll('section, form').forEach(el => {
-          el.style.display = 'none';
-      });
-      document.getElementById('faculty-dashboard').style.display = 'block';
+      // Decode JWT to check user role
+      const token = getToken();
+      let userRole = null;
+      if (token) {
+        try {
+          const base64Url = token.split('.')[1];
+          const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+          const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+          }).join(''));
+          const payload = JSON.parse(jsonPayload);
+          userRole = payload.role;
+        } catch (err) {
+          userRole = null;
+        }
+      }
+      if (userRole === 'faculty' || userRole === 'instructor') {
+        document.querySelectorAll('section, form').forEach(el => {
+            el.style.display = 'none';
+        });
+        document.getElementById('faculty-dashboard').style.display = 'block';
+      } else {
+        Swal.fire('Access Denied', 'You must be an instructor to access the faculty dashboard.', 'error');
+      }
   });
   // Student Dashboard Navigation
   document.getElementById('nav-student').addEventListener('click', function (event) {
@@ -386,7 +406,7 @@ document.addEventListener('DOMContentLoaded', function () {
           });
           if (data.user.role === 'student') {
             document.getElementById('student-dashboard').style.display = 'block';
-          } else if (data.user.role === 'faculty') {
+          } else if (data.user.role === 'faculty' || data.user.role === 'instructor') {
             document.getElementById('faculty-dashboard').style.display = 'block';
           }
         }, 1000);

@@ -26,4 +26,6 @@ coverage/
 .idea/
 *.swp
 
-node_modules/
+# Ignore database
+src/backend/database.sqlite
+

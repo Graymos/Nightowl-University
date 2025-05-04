@@ -371,3 +371,9 @@ body {
     font-size: clamp(1rem, 5vw, 1.5rem);
   }
 }
+
+/* Highlight invalid input fields */
+.is-invalid {
+  border-color: #dc3545 !important;
+  box-shadow: 0 0 0 0.2rem rgba(220,53,69,.25) !important;
+}

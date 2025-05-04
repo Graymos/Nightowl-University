@@ -58,7 +58,7 @@ router.post('/register/student', async (req, res) => {
 // Register a new faculty member
 router.post('/register/faculty', async (req, res) => {
   try {
-    const { first_name, last_name, email, password } = req.body;
+    const { first_name, middle_name, last_name, email, password, phone_number } = req.body;
 
     // Check if user already exists
     const existingUser = await User.findByEmail(email);
@@ -73,10 +73,11 @@ router.post('/register/faculty', async (req, res) => {
     // Create new user
     const newUser = await User.create({
       first_name,
-      middle_name: null,
+      middle_name: middle_name || null,
       last_name,
       email,
       password: hashedPassword,
+      phone_number: phone_number || null,
       role: 'instructor'
     });
 

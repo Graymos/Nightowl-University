@@ -158,12 +158,11 @@ document.addEventListener('DOMContentLoaded', function () {
     event.preventDefault();
     removeToken();
     checkAuthState();
-    // Redirect to home page
-    document.querySelectorAll('section, form').forEach(el => {
-      el.style.display = 'none';
+    
+    // Redirect to index.html without hash
+    Swal.fire('Success', 'You have been logged out.', 'success').then(() => {
+      window.location.href = 'index.html';
     });
-    document.getElementById('features-section').style.display = 'block';
-    Swal.fire('Success', 'You have been logged out.', 'success');
   });
 
   // --- Helper: Show or clear error messages below fields ---

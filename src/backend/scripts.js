@@ -1,6 +1,7 @@
 // Wait until the DOM content is loaded
 document.addEventListener('DOMContentLoaded', function () {
   updateParallax();
+  checkAuthState(); // Check authentication state on page load
 
   // Navigation: Hide all sections/forms and show the target section
   window.navigateToSection = function (section) {
@@ -33,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function () {
       const hero = document.querySelector('.hero');
       const scrolled = window.pageYOffset;
       // Background moves at 25% of scroll speed
-      hero.style.backgroundPosition = "center " + (-scrolled * -0.35) + "px";
+      hero.style.backgroundPosition = "center " + (-scrolled * -0.45) + "px";
   }
   window.addEventListener('scroll', updateParallax);
 
@@ -115,6 +116,56 @@ document.addEventListener('DOMContentLoaded', function () {
       document.getElementById('frmScheduleReview').style.display = 'block';
 
   });
+
+  // --- JWT Authentication Functions ---
+  function saveToken(token) {
+    localStorage.setItem('jwt_token', token);
+  }
+
+  function getToken() {
+    return localStorage.getItem('jwt_token');
+  }
+
+  function removeToken() {
+    localStorage.removeItem('jwt_token');
+  }
+
+  function isAuthenticated() {
+    const token = getToken();
+    return token !== null;
+  }
+
+  function checkAuthState() {
+    const navLoginButton = document.getElementById('nav-login');
+    const navRegisterButton = document.getElementById('nav-register');
+    const navLogoutButton = document.getElementById('nav-logout');
+    
+    if (isAuthenticated()) {
+      // User is logged in
+      navLoginButton.style.display = 'none';
+      navRegisterButton.style.display = 'none';
+      navLogoutButton.style.display = 'block';
+    } else {
+      // User is not logged in
+      navLoginButton.style.display = 'block';
+      navRegisterButton.style.display = 'block';
+      navLogoutButton.style.display = 'none';
+    }
+  }
+
+  // --- Logout function ---
+  document.getElementById('nav-logout').addEventListener('click', function (event) {
+    event.preventDefault();
+    removeToken();
+    checkAuthState();
+    // Redirect to home page
+    document.querySelectorAll('section, form').forEach(el => {
+      el.style.display = 'none';
+    });
+    document.getElementById('features-section').style.display = 'block';
+    Swal.fire('Success', 'You have been logged out.', 'success');
+  });
+
   // --- Helper: Show or clear error messages below fields ---
   function showFieldError(inputId, message) {
     let input = document.getElementById(inputId);
@@ -270,11 +321,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const email = document.getElementById('txtStudentLoginEmail').value.trim();
     const password = document.getElementById('txtStudentLoginPassword').value;
 
-    const navLoginButton = document.getElementById('nav-login');
-    const navRegisterButton = document.getElementById('nav-register');
-    const navLogoutButton = document.getElementById('nav-logout');
-
-
     let hasError = false;
     if (!email) {
       showFieldError('txtStudentLoginEmail', 'Email is required.');
@@ -294,12 +340,23 @@ document.addEventListener('DOMContentLoaded', function () {
       });
       const data = await res.json();
       if (res.ok) {
-
+        // Save the JWT token
+        if (data.token) {
+          saveToken(data.token);
+        }
         Swal.fire('Success', `Login successful! Welcome, ${data.user.first_name}.`, 'success');
-        // TODO: Show dashboard or next view
-        navLoginButton.style.display = 'none';
-        navRegisterButton.style.display = 'none';
-        navLogoutButton.style.display = 'block';
+        checkAuthState(); // Update navigation bar
+        // Redirect to appropriate dashboard based on user role
+        setTimeout(() => {
+          document.querySelectorAll('section, form').forEach(el => {
+            el.style.display = 'none';
+          });
+          if (data.user.role === 'student') {
+            document.getElementById('student-dashboard').style.display = 'block';
+          } else if (data.user.role === 'faculty') {
+            document.getElementById('faculty-dashboard').style.display = 'block';
+          }
+        }, 1000);
       } else {
         Swal.fire('Error', data.message || 'Login failed.', 'error');
       }
@@ -308,5 +365,57 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
-});
+  // --- Add JWT token to all API requests ---
+  const originalFetch = window.fetch;
+  window.fetch = function(...args) {
+    const token = getToken();
+    
+    // If it's an options object (args[1]), add Authorization header
+    if (token && args[1] && typeof args[1] === 'object') {
+      args[1].headers = args[1].headers || {};
+      args[1].headers['Authorization'] = `Bearer ${token}`;
+    }
+    // If no options object, create one with Authorization header
+    else if (token && !args[1]) {
+      args[1] = {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      };
+    }
+    
+    return originalFetch.apply(this, args);
+  };
 
+  // --- Handle token expiration ---
+  function setupTokenExpirationCheck() {
+    setInterval(() => {
+      const token = getToken();
+      if (token) {
+        // You can add token expiration check here
+        // For example, decode JWT and check exp claim
+        try {
+          const base64Url = token.split('.')[1];
+          const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+          const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+          }).join(''));
+          
+          const payload = JSON.parse(jsonPayload);
+          
+          // Check if token is expired
+          if (payload.exp && Date.now() >= payload.exp * 1000) {
+            removeToken();
+            checkAuthState();
+            Swal.fire('Session Expired', 'Your session has expired. Please log in again.', 'warning');
+          }
+        } catch (err) {
+          console.error('Token parsing error:', err);
+        }
+      }
+    }, 60000); // Check every minute
+  }
+
+  setupTokenExpirationCheck();
+
+});

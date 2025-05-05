@@ -37,35 +37,35 @@ document.addEventListener('DOMContentLoaded', function() {
         const navLogoutButton = document.getElementById('nav-logout');
         
         if (authToken && currentUser) {
-            // Update UI for logged in user
-            document.querySelectorAll('.logged-out-only').forEach(el => el.style.display = 'none');
-            document.querySelectorAll('.logged-in-only').forEach(el => el.style.display = 'block');
+        // Update UI for logged in user
+        document.querySelectorAll('.logged-out-only').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('.logged-in-only').forEach(el => el.style.display = 'block');
             
             // Update navbar buttons
             if (navLoginButton) navLoginButton.style.display = 'none';
             if (navRegisterButton) navRegisterButton.style.display = 'none';
             if (navLogoutButton) navLogoutButton.style.display = 'block';
-            
-            // Update user info display
-            document.querySelectorAll('.user-name').forEach(el => {
-                el.textContent = `${currentUser.first_name} ${currentUser.last_name}`;
-            });
-            
-            // Show different nav based on role
-            if (currentUser.role === 'instructor') {
-                document.querySelectorAll('.instructor-only').forEach(el => el.style.display = 'block');
-                document.querySelectorAll('.student-only').forEach(el => el.style.display = 'none');
-            } else {
-                document.querySelectorAll('.instructor-only').forEach(el => el.style.display = 'none');
-                document.querySelectorAll('.student-only').forEach(el => el.style.display = 'block');
-            }
-            return true;
-        } else {
-            // Update UI for logged out user
-            document.querySelectorAll('.logged-out-only').forEach(el => el.style.display = 'block');
-            document.querySelectorAll('.logged-in-only').forEach(el => el.style.display = 'none');
-            document.querySelectorAll('.instructor-only').forEach(el => el.style.display = 'none');
+        
+        // Update user info display
+          document.querySelectorAll('.user-name').forEach(el => {
+            el.textContent = `${currentUser.first_name} ${currentUser.last_name}`;
+          });
+          
+          // Show different nav based on role
+          if (currentUser.role === 'instructor') {
+            document.querySelectorAll('.instructor-only').forEach(el => el.style.display = 'block');
             document.querySelectorAll('.student-only').forEach(el => el.style.display = 'none');
+          } else {
+            document.querySelectorAll('.instructor-only').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.student-only').forEach(el => el.style.display = 'block');
+          }
+            return true;
+      } else {
+        // Update UI for logged out user
+        document.querySelectorAll('.logged-out-only').forEach(el => el.style.display = 'block');
+        document.querySelectorAll('.logged-in-only').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('.instructor-only').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('.student-only').forEach(el => el.style.display = 'none');
             
             // Update navbar buttons
             if (navLoginButton) navLoginButton.style.display = 'block';
@@ -113,52 +113,52 @@ document.addEventListener('DOMContentLoaded', function() {
                 e.preventDefault();
             }
             
-            const email = document.getElementById('txtStudentLoginEmail').value;
-            const password = document.getElementById('txtStudentLoginPassword').value;
-            
-            if (!email || !password) {
+        const email = document.getElementById('txtStudentLoginEmail').value;
+        const password = document.getElementById('txtStudentLoginPassword').value;
+        
+        if (!email || !password) {
                 showError('Please enter both email and password');
-                return;
-            }
-            
-            try {
-                const response = await fetch(`${API_URL}/users/login`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ email, password })
-                });
-                
-                const data = await response.json();
-                
-                if (!response.ok) {
-                    throw new Error(data.message || 'Login failed');
-                }
-                
-                // Store token and user data
-                localStorage.setItem('authToken', data.token);
-                localStorage.setItem('currentUser', JSON.stringify(data.user));
-                authToken = data.token;
-                currentUser = data.user;
-                
-                // Update UI
-                checkAuth();
+          return;
+        }
+        
+        try {
+          const response = await fetch(`${API_URL}/users/login`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email, password })
+          });
+          
+          const data = await response.json();
+          
+          if (!response.ok) {
+            throw new Error(data.message || 'Login failed');
+          }
+          
+          // Store token and user data
+          localStorage.setItem('authToken', data.token);
+          localStorage.setItem('currentUser', JSON.stringify(data.user));
+          authToken = data.token;
+          currentUser = data.user;
+          
+          // Update UI
+          checkAuth();
                 
                 // Show success message
                 showSuccess(`Welcome back, ${data.user.first_name}!`);
-                
-                // Redirect based on role
-                if (data.user.role === 'instructor') {
+          
+          // Redirect based on role
+          if (data.user.role === 'instructor') {
                     navigateToSection('faculty-dashboard');
-                } else {
-                    navigateToSection('student-dashboard');
-                }
-                
-            } catch (error) {
+          } else {
+            navigateToSection('student-dashboard');
+          }
+          
+        } catch (error) {
                 showError(error.message || 'Login failed. Please try again.');
-            }
-        });
+        }
+      });
     }
   
     // Handle student registration form submission
@@ -364,54 +364,64 @@ document.addEventListener('DOMContentLoaded', function() {
             throw new Error('Invalid response format from server');
           }
 
-          const courseList = document.getElementById('courseList');
-          courseList.innerHTML = '';
-
           if (data.courses.length === 0) {
-            courseList.innerHTML = `
-                <tr>
-                    <td colspan="5" class="text-center">
-                        <div class="alert alert-info">
-                            No courses found. Create your first course using the form above.
-                        </div>
-                    </td>
-                </tr>
+            document.getElementById('courseChart').innerHTML = `
+              <div class="alert alert-info text-center">
+                No courses found. Create your first course using the form above.
+              </div>
             `;
             return;
           }
 
-          data.courses.forEach(course => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-              <td>${course.title}</td>
-              <td>${course.code}</td>
-              <td>${course.student_count || 0}</td>
-              <td>${course.team_count || 0}</td>
-              <td>
-                <button class="btn btn-sm btn-primary view-course" data-course-id="${course.id}">View Details</button>
-              </td>
-            `;
-            courseList.appendChild(row);
-          });
+          // Create the course list table
+          const courseList = document.createElement('div');
+          courseList.className = 'table-responsive mt-4';
+          courseList.innerHTML = `
+            <table class="table table-striped table-bordered">
+              <thead>
+                <tr>
+                  <th>Course Name</th>
+                  <th>Course Code</th>
+                  <th>Students</th>
+                  <th>Teams</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${data.courses.map(course => `
+                  <tr>
+                    <td>${course.title}</td>
+                    <td>${course.code}</td>
+                    <td>${course.student_count || 0}</td>
+                    <td>${course.team_count || 0}</td>
+                    <td>
+                      <button class="btn btn-sm btn-primary view-course" data-course-id="${course.id}">View Details</button>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          `;
 
           // Add event listeners to view buttons
-          document.querySelectorAll('.view-course').forEach(button => {
+          courseList.querySelectorAll('.view-course').forEach(button => {
             button.addEventListener('click', () => courseManagement.showCourseDetails(button.dataset.courseId));
           });
+
+          // Clear the container and add the table
+          const container = document.getElementById('courseChart');
+          container.innerHTML = '';
+          container.appendChild(courseList);
+
         } catch (error) {
           console.error('Error loading courses:', error);
           showError('Error loading courses: ' + error.message);
           
-          const courseList = document.getElementById('courseList');
-          courseList.innerHTML = `
-                <tr>
-                    <td colspan="5" class="text-center">
-                        <div class="alert alert-warning">
-                            Unable to load courses. Please try again later.
-                        </div>
-                    </td>
-                </tr>
-            `;
+          document.getElementById('courseChart').innerHTML = `
+            <div class="alert alert-warning text-center">
+              Unable to load courses. Please try again later.
+            </div>
+          `;
         }
       },
 
@@ -442,8 +452,27 @@ document.addEventListener('DOMContentLoaded', function() {
             const course = data.course;
             const students = data.students || [];
 
-            // Update modal title
+            // Update modal title and add description
             document.getElementById('courseDetailsModalLabel').textContent = course.title;
+            
+            // Clear existing description if any
+            const existingDescription = document.querySelector('#courseDetailsModal .course-description');
+            if (existingDescription) {
+                existingDescription.remove();
+            }
+            
+            // Add course description section
+            const modalBody = document.querySelector('#courseDetailsModal .modal-body');
+            const descriptionSection = document.createElement('div');
+            descriptionSection.className = 'mb-4 course-description';
+            descriptionSection.innerHTML = `
+                <h6 class="mb-2">Course Description</h6>
+                <p class="text-muted">${course.description || 'No description provided.'}</p>
+                <hr>
+            `;
+            
+            // Insert description before the tabs
+            modalBody.insertBefore(descriptionSection, modalBody.firstChild);
 
             // Populate student list
             const studentList = document.getElementById('studentList');
@@ -535,6 +564,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <td>${team.member_count || 0} members</td>
                     <td>
                         <button class="btn btn-sm btn-primary view-team" data-team-id="${team.id}">View Members</button>
+                        <button class="btn btn-sm btn-success add-member" data-team-id="${team.id}">Add Member</button>
                         <button class="btn btn-sm btn-danger delete-team" data-team-id="${team.id}">Delete</button>
                     </td>
                 `;
@@ -544,6 +574,10 @@ document.addEventListener('DOMContentLoaded', function() {
             // Add event listeners to team buttons
             document.querySelectorAll('.view-team').forEach(button => {
                 button.addEventListener('click', () => courseManagement.showTeamMembers(button.dataset.teamId));
+            });
+
+            document.querySelectorAll('.add-member').forEach(button => {
+                button.addEventListener('click', () => courseManagement.showAddMemberModal(button.dataset.teamId));
             });
 
             document.querySelectorAll('.delete-team').forEach(button => {
@@ -578,24 +612,142 @@ document.addEventListener('DOMContentLoaded', function() {
             const data = await response.json();
             const members = data.members || [];
 
-            // Show members in a modal or alert
-            if (members.length === 0) {
-                showError('No members in this team');
-                return;
-            }
+            // Create modal content
+            const modalContent = document.createElement('div');
+            modalContent.innerHTML = `
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${members.map(member => `
+                                <tr>
+                                    <td>${member.first_name} ${member.last_name}</td>
+                                    <td>${member.email}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-danger remove-member" data-student-id="${member.id}">
+                                            Remove
+                                        </button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
 
-            const memberList = members.map(member => 
-                `${member.first_name} ${member.last_name} (${member.email})`
-            ).join('\n');
-
+            // Show modal with team members
             Swal.fire({
                 title: 'Team Members',
-                html: `<pre>${memberList}</pre>`,
-                confirmButtonText: 'Close'
+                html: modalContent,
+                width: '600px',
+                showCloseButton: true,
+                showConfirmButton: false
+            });
+
+            // Add event listeners to remove buttons
+            document.querySelectorAll('.remove-member').forEach(button => {
+                button.addEventListener('click', () => {
+                    courseManagement.removeMemberFromTeam(teamId, button.dataset.studentId);
+                    Swal.close();
+                });
             });
         } catch (error) {
             console.error('Error loading team members:', error);
             showError('Error loading team members: ' + error.message);
+        }
+    },
+
+    // Show add member modal
+    showAddMemberModal: async (teamId) => {
+        try {
+            if (!checkAuth()) {
+                showError('Please log in to add team members');
+                return;
+            }
+
+            // Get available students (not in any team)
+            const response = await fetch(`${API_URL}/courses/${currentCourseId}/students`, {
+                headers: {
+                    'Authorization': `Bearer ${authToken}`,
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to load available students');
+            }
+
+            const data = await response.json();
+            const students = data.students || [];
+
+            if (students.length === 0) {
+                showError('No available students to add to the team');
+                return;
+            }
+
+            // Create modal content
+            const modalContent = document.createElement('div');
+            modalContent.innerHTML = `
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${students.map(student => `
+                                <tr>
+                                    <td>${student.first_name} ${student.last_name}</td>
+                                    <td>${student.email}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-success add-to-team" data-student-id="${student.id}">
+                                            Add to Team
+                                        </button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            // Show modal with available students
+            Swal.fire({
+                title: 'Add Team Member',
+                html: modalContent,
+                width: '600px',
+                showCloseButton: true,
+                showConfirmButton: false,
+                customClass: {
+                    container: 'add-member-modal'
+                }
+            });
+
+            // Add event listeners to add buttons
+            document.querySelectorAll('.add-to-team').forEach(button => {
+                button.addEventListener('click', async () => {
+                    try {
+                        await courseManagement.addMemberToTeam(teamId, button.dataset.studentId);
+                        Swal.close();
+                    } catch (error) {
+                        console.error('Error adding team member:', error);
+                        showError(error.message || 'Failed to add team member');
+                    }
+                });
+            });
+        } catch (error) {
+            console.error('Error showing add member modal:', error);
+            showError('Error showing add member modal: ' + error.message);
         }
     },
 
@@ -830,6 +982,159 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error removing student from course:', error);
             showError('Error removing student from course: ' + error.message);
         }
+    },
+
+    // Create team
+    createTeam: async (courseId, teamData) => {
+        try {
+            if (!checkAuth()) {
+                showError('Please log in to create teams');
+                return;
+            }
+
+            const response = await fetch(`${API_URL}/courses/${courseId}/teams`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${authToken}`,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(teamData)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to create team');
+            }
+
+            showSuccess('Team created successfully');
+            await courseManagement.loadTeams(courseId);
+            return await response.json();
+        } catch (error) {
+            console.error('Error creating team:', error);
+            showError('Error creating team: ' + error.message);
+            throw error;
+        }
+    },
+
+    // Add member to team
+    addMemberToTeam: async (teamId, studentId) => {
+        try {
+            if (!currentCourseId) {
+                throw new Error('No course selected');
+            }
+
+            console.log('Adding member to team:', {
+                courseId: currentCourseId,
+                teamId,
+                studentId
+            });
+
+            const response = await fetch(`${API_URL}/courses/${currentCourseId}/teams/${teamId}/members`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify({ student_id: parseInt(studentId) })
+            });
+
+            console.log('Response status:', response.status);
+            const responseText = await response.text();
+            console.log('Response text:', responseText);
+
+            if (!response.ok) {
+                let errorMessage = 'Failed to add team member';
+                try {
+                    const errorData = JSON.parse(responseText);
+                    errorMessage = errorData.message || errorMessage;
+                } catch (e) {
+                    console.error('Error parsing error response:', e);
+                }
+                throw new Error(errorMessage);
+            }
+
+            // Close the modal
+            const modal = document.getElementById('addMemberModal');
+            if (modal) {
+                modal.remove();
+            }
+
+            // Refresh the team list
+            await courseManagement.loadTeams(currentCourseId);
+            
+            // Show success message
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: 'Team member added successfully',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        } catch (error) {
+            console.error('Error adding team member:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: error.message || 'Failed to add team member'
+            });
+        }
+    },
+
+    // Remove member from team
+    removeMemberFromTeam: async (teamId, studentId) => {
+        try {
+            if (!currentCourseId) {
+                throw new Error('No course selected');
+            }
+
+            console.log('Removing member from team:', {
+                courseId: currentCourseId,
+                teamId,
+                studentId
+            });
+
+            const response = await fetch(`${API_URL}/courses/${currentCourseId}/teams/${teamId}/members/${studentId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+
+            console.log('Response status:', response.status);
+            const responseText = await response.text();
+            console.log('Response text:', responseText);
+
+            if (!response.ok) {
+                let errorMessage = 'Failed to remove team member';
+                try {
+                    const errorData = JSON.parse(responseText);
+                    errorMessage = errorData.message || errorMessage;
+                } catch (e) {
+                    console.error('Error parsing error response:', e);
+                }
+                throw new Error(errorMessage);
+            }
+
+            // Refresh the team list
+            await courseManagement.loadTeams(currentCourseId);
+
+            // Show success message
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: 'Team member removed successfully',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        } catch (error) {
+            console.error('Error removing team member:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: error.message || 'Failed to remove team member'
+            });
+        }
     }
 };
 
@@ -865,28 +1170,98 @@ document.addEventListener('DOMContentLoaded', function() {
     const createTeamBtn = document.getElementById('btnCreateTeam');
     if (createTeamBtn) {
         createTeamBtn.addEventListener('click', () => {
-            const modal = new bootstrap.Modal(document.getElementById('createTeamModal'));
-            modal.show();
-        });
-    }
+            console.log('Create team button clicked');
+            
+            if (!currentCourseId) {
+                showError('No course selected');
+                return;
+            }
 
-    // Create team form
-    const teamForm = document.getElementById('frmCreateTeam');
-    if (teamForm) {
-        teamForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const teamData = {
-                name: document.getElementById('txtTeamName').value,
-                members: Array.from(document.querySelectorAll('#teamMemberList input:checked')).map(input => input.value)
-            };
-            try {
-                await courseManagement.createTeam(currentCourseId, teamData);
-                teamForm.reset();
-                const modal = bootstrap.Modal.getInstance(document.getElementById('createTeamModal'));
-                modal.hide();
-                await courseManagement.loadTeams(currentCourseId);
-            } catch (error) {
-                console.error('Error creating team:', error);
+            // Create modal HTML
+            const modalHTML = `
+                <div class="modal fade" id="createTeamModal" tabindex="-1" aria-labelledby="createTeamModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="createTeamModalLabel">Create New Team</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="frmCreateTeam" class="needs-validation" novalidate>
+                                    <div class="mb-3">
+                                        <label for="txtTeamName" class="form-label">Team Name</label>
+                                        <input type="text" class="form-control" id="txtTeamName" required>
+                                        <div class="invalid-feedback">
+                                            Please enter a team name.
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn btn-primary">Create Team</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Remove existing modal if any
+            const existingModal = document.getElementById('createTeamModal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+
+            // Add new modal to body
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+            // Get the new modal element
+            const modalElement = document.getElementById('createTeamModal');
+
+            // Create and show modal
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+
+            // Add form submit handler
+            const form = document.getElementById('frmCreateTeam');
+            if (form) {
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    if (!form.checkValidity()) {
+                        form.classList.add('was-validated');
+                        return;
+                    }
+
+                    const teamName = document.getElementById('txtTeamName').value.trim();
+                    if (!teamName) {
+                        showError('Please enter a team name');
+                        return;
+                    }
+
+                    try {
+                        const submitBtn = form.querySelector('button[type="submit"]');
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Creating...';
+
+                        await courseManagement.createTeam(currentCourseId, { name: teamName });
+                        
+                        form.reset();
+                        form.classList.remove('was-validated');
+                        modal.hide();
+                        
+                        showSuccess('Team created successfully');
+                        await courseManagement.loadTeams(currentCourseId);
+                    } catch (error) {
+                        console.error('Error creating team:', error);
+                        showError(error.message || 'Failed to create team');
+                    } finally {
+                        const submitBtn = form.querySelector('button[type="submit"]');
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = 'Create Team';
+                    }
+                });
             }
         });
     }

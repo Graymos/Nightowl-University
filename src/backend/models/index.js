@@ -277,6 +277,15 @@ const Team = {
     });
   },
 
+  findById: (teamId) => {
+    return new Promise((resolve, reject) => {
+      db.get('SELECT * FROM teams WHERE id = ?', [teamId], (err, row) => {
+        if (err) reject(err);
+        resolve(row);
+      });
+    });
+  },
+
   addMember: (teamId, studentId) => {
     return new Promise((resolve, reject) => {
       db.run(
@@ -285,6 +294,19 @@ const Team = {
         function(err) {
           if (err) reject(err);
           resolve({ id: this.lastID, team_id: teamId, student_id: studentId });
+        }
+      );
+    });
+  },
+
+  removeMember: (teamId, studentId) => {
+    return new Promise((resolve, reject) => {
+      db.run(
+        'DELETE FROM team_members WHERE team_id = ? AND student_id = ?',
+        [teamId, studentId],
+        function(err) {
+          if (err) reject(err);
+          resolve({ team_id: teamId, student_id: studentId });
         }
       );
     });
@@ -309,13 +331,37 @@ const Team = {
   getTeamsForCourse: (courseId) => {
     return new Promise((resolve, reject) => {
       db.all(
-        'SELECT * FROM teams WHERE course_id = ?',
+        `SELECT t.*, 
+          (SELECT COUNT(*) FROM team_members WHERE team_id = t.id) as member_count
+         FROM teams t 
+         WHERE t.course_id = ?`,
         [courseId],
         (err, rows) => {
           if (err) reject(err);
           resolve(rows);
         }
       );
+    });
+  },
+
+  delete: (teamId) => {
+    return new Promise((resolve, reject) => {
+      // First delete all team members
+      db.run('DELETE FROM team_members WHERE team_id = ?', [teamId], (err) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+        
+        // Then delete the team itself
+        db.run('DELETE FROM teams WHERE id = ?', [teamId], function(err) {
+          if (err) {
+            reject(err);
+            return;
+          }
+          resolve({ id: teamId, deleted: true });
+        });
+      });
     });
   }
 };

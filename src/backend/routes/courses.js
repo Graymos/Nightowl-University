@@ -266,4 +266,83 @@ router.delete('/:courseId/students/:studentId', authenticate, async (req, res) =
     }
 });
 
+// Add member to team (instructor only)
+router.post('/:courseId/teams/:teamId/members', authenticate, isInstructor, async (req, res) => {
+  try {
+    const { courseId, teamId } = req.params;
+    const { student_id } = req.body;
+
+    if (!student_id) {
+      return res.status(400).json({ message: 'Student ID is required' });
+    }
+
+    // Check if course exists and instructor owns it
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+    
+    if (course.instructor_id !== req.user.id) {
+      return res.status(403).json({ message: 'Not authorized to modify teams in this course' });
+    }
+
+    // Check if team exists and belongs to the course
+    const team = await Team.findById(teamId);
+    if (!team || team.course_id !== parseInt(courseId)) {
+      return res.status(404).json({ message: 'Team not found in this course' });
+    }
+
+    // Check if student is enrolled in the course
+    const enrolledStudents = await Course.getEnrolledStudents(courseId);
+    if (!enrolledStudents.some(student => student.id === parseInt(student_id))) {
+      return res.status(400).json({ message: 'Student is not enrolled in this course' });
+    }
+
+    // Check if student is already in the team
+    const teamMembers = await Team.getTeamMembers(teamId);
+    if (teamMembers.some(member => member.id === parseInt(student_id))) {
+      return res.status(400).json({ message: 'Student is already a member of this team' });
+    }
+
+    // Add member to team
+    await Team.addMember(teamId, student_id);
+    
+    res.status(201).json({ message: 'Team member added successfully' });
+  } catch (error) {
+    console.error('Error adding team member:', error);
+    res.status(500).json({ message: 'Error adding team member', error: error.message });
+  }
+});
+
+// Remove member from team (instructor only)
+router.delete('/:courseId/teams/:teamId/members/:studentId', authenticate, isInstructor, async (req, res) => {
+  try {
+    const { courseId, teamId, studentId } = req.params;
+
+    // Check if course exists and instructor owns it
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+    
+    if (course.instructor_id !== req.user.id) {
+      return res.status(403).json({ message: 'Not authorized to modify teams in this course' });
+    }
+
+    // Check if team exists and belongs to the course
+    const team = await Team.findById(teamId);
+    if (!team || team.course_id !== parseInt(courseId)) {
+      return res.status(404).json({ message: 'Team not found in this course' });
+    }
+
+    // Remove member from team
+    await Team.removeMember(teamId, studentId);
+    
+    res.json({ message: 'Team member removed successfully' });
+  } catch (error) {
+    console.error('Error removing team member:', error);
+    res.status(500).json({ message: 'Error removing team member', error: error.message });
+  }
+});
+
 module.exports = router;

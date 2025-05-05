@@ -197,6 +197,7 @@ const setupDatabase = () => {
   });
 };
 
+// Export both the database connection and setup function
 module.exports = {
   db,
   setupDatabase

@@ -49,11 +49,7 @@ document.addEventListener('DOMContentLoaded', function () {
       document.getElementById('formLogin').style.display = 'none';
       document.getElementById('formStudent').style.display = 'block';
   });
-  document.getElementById('btnShowRegisterFaculty').addEventListener('click', function () {
-      document.getElementById('formLogin').style.display = 'none';
-      document.getElementById('formStudent').style.display = 'none';
-      document.getElementById('formFaculty').style.display = 'block';
-  });
+
   document.getElementById('btnShowLoginFaculty').addEventListener('click', function () {
       document.getElementById('formLogin').style.display = 'block';
       document.getElementById('formStudent').style.display = 'none';
@@ -213,6 +209,28 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // --- Logout function ---
   document.getElementById('nav-logout').addEventListener('click', function (event) {
+    event.preventDefault();
+    removeToken();
+    checkAuthState();
+    
+    // Redirect to index.html without hash
+    Swal.fire('Success', 'You have been logged out.', 'success').then(() => {
+      window.location.href = 'index.html';
+    });
+  });
+
+  document.getElementById('btnStudentLogout').addEventListener('click', function (event) {
+    event.preventDefault();
+    removeToken();
+    checkAuthState();
+    
+    // Redirect to index.html without hash
+    Swal.fire('Success', 'You have been logged out.', 'success').then(() => {
+      window.location.href = 'index.html';
+    });
+  });
+
+  document.getElementById('btnFacultyLogout').addEventListener('click', function (event) {
     event.preventDefault();
     removeToken();
     checkAuthState();

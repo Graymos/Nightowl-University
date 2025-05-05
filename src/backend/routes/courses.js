@@ -59,7 +59,7 @@ router.get('/:id', authenticate, async (req, res) => {
     
     // If user is the instructor, include student list
     if (isInstructor) {
-      const students = await Course.getStudents(course.id);
+      const students = await Course.getEnrolledStudents(course.id);
       return res.json({ course, students });
     }
 
@@ -216,6 +216,54 @@ router.get('/teams/:teamId/members', authenticate, async (req, res) => {
     console.error('Error fetching team members:', error);
     res.status(500).json({ message: 'Error fetching team members', error: error.message });
   }
+});
+
+// Get all students enrolled in a course
+router.get('/:courseId/students', authenticate, async (req, res) => {
+    try {
+        const { courseId } = req.params;
+        const students = await Course.getEnrolledStudents(courseId);
+        res.json({ students });
+    } catch (error) {
+        console.error('Error getting enrolled students:', error);
+        res.status(500).json({ error: 'Failed to get enrolled students' });
+    }
+});
+
+// Add a student to a course
+router.post('/:courseId/students', authenticate, async (req, res) => {
+    try {
+        const { courseId } = req.params;
+        const { student_id } = req.body;
+
+        if (!student_id) {
+            return res.status(400).json({ error: 'Student ID is required' });
+        }
+
+        // Check if student is already enrolled
+        const enrolledStudents = await Course.getEnrolledStudents(courseId);
+        if (enrolledStudents.some(student => student.id === student_id)) {
+            return res.status(400).json({ error: 'Student is already enrolled in this course' });
+        }
+
+        await Course.addStudent(courseId, student_id);
+        res.json({ message: 'Student added to course successfully' });
+    } catch (error) {
+        console.error('Error adding student to course:', error);
+        res.status(500).json({ error: 'Failed to add student to course' });
+    }
+});
+
+// Remove a student from a course
+router.delete('/:courseId/students/:studentId', authenticate, async (req, res) => {
+    try {
+        const { courseId, studentId } = req.params;
+        await Course.removeStudent(courseId, studentId);
+        res.json({ message: 'Student removed from course successfully' });
+    } catch (error) {
+        console.error('Error removing student from course:', error);
+        res.status(500).json({ error: 'Failed to remove student from course' });
+    }
 });
 
 module.exports = router;

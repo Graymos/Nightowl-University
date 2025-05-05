@@ -4,6 +4,7 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const { User } = require('../models');
 const { generateToken, authenticate } = require('../middleware/auth');
+const { db } = require('../config/database');
 
 // Register a new student
 router.post('/register/student', async (req, res) => {
@@ -168,6 +169,24 @@ router.get('/profile', authenticate, async (req, res) => {
     console.error('Error fetching profile:', error);
     res.status(500).json({ message: 'Error fetching profile', error: error.message });
   }
+});
+
+// Get all students
+router.get('/students', authenticate, async (req, res) => {
+  const query = `
+    SELECT id, first_name, last_name, email
+    FROM users
+    WHERE role = 'student'
+    ORDER BY last_name, first_name
+  `;
+  
+  db.all(query, [], (err, students) => {
+    if (err) {
+      console.error('Error getting students:', err);
+      return res.status(500).json({ message: 'Failed to get students' });
+    }
+    res.json({ students });
+  });
 });
 
 module.exports = router;

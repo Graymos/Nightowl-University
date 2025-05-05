@@ -88,7 +88,24 @@ const Course = {
     });
   },
 
-  enrollStudent: (courseId, studentId) => {
+  getEnrolledStudents: (courseId) => {
+    return new Promise((resolve, reject) => {
+      db.all(
+        `SELECT u.id, u.first_name, u.last_name, u.email
+         FROM users u
+         JOIN enrollments e ON u.id = e.student_id
+         WHERE e.course_id = ?
+         ORDER BY u.last_name, u.first_name`,
+        [courseId],
+        (err, rows) => {
+          if (err) reject(err);
+          resolve(rows);
+        }
+      );
+    });
+  },
+
+  addStudent: (courseId, studentId) => {
     return new Promise((resolve, reject) => {
       db.run(
         'INSERT INTO enrollments (course_id, student_id) VALUES (?, ?)',
@@ -96,25 +113,6 @@ const Course = {
         function(err) {
           if (err) reject(err);
           resolve({ id: this.lastID, course_id: courseId, student_id: studentId });
-        }
-      );
-    });
-  },
-
-  getStudents: (courseId) => {
-    return new Promise((resolve, reject) => {
-      db.all(
-        `SELECT u.id, u.first_name, u.middle_name, u.last_name, u.email, u.phone_number, u.discord_id,
-          t.name as team_name
-        FROM users u
-        JOIN enrollments e ON u.id = e.student_id
-        LEFT JOIN team_members tm ON u.id = tm.student_id
-        LEFT JOIN teams t ON tm.team_id = t.id
-        WHERE e.course_id = ? AND u.role = 'student'`,
-        [courseId],
-        (err, rows) => {
-          if (err) reject(err);
-          resolve(rows);
         }
       );
     });

@@ -32,31 +32,46 @@ document.addEventListener('DOMContentLoaded', function() {
         authToken = localStorage.getItem('authToken');
         currentUser = JSON.parse(localStorage.getItem('currentUser'));
         
-        if (authToken && currentUser) {
-        // Update UI for logged in user
-        document.querySelectorAll('.logged-out-only').forEach(el => el.style.display = 'none');
-        document.querySelectorAll('.logged-in-only').forEach(el => el.style.display = 'block');
+        const navLoginButton = document.getElementById('nav-login');
+        const navRegisterButton = document.getElementById('nav-register');
+        const navLogoutButton = document.getElementById('nav-logout');
         
-        // Update user info display
-          document.querySelectorAll('.user-name').forEach(el => {
-            el.textContent = `${currentUser.first_name} ${currentUser.last_name}`;
-          });
-          
-          // Show different nav based on role
-          if (currentUser.role === 'instructor') {
-            document.querySelectorAll('.instructor-only').forEach(el => el.style.display = 'block');
-            document.querySelectorAll('.student-only').forEach(el => el.style.display = 'none');
-          } else {
-            document.querySelectorAll('.instructor-only').forEach(el => el.style.display = 'none');
-            document.querySelectorAll('.student-only').forEach(el => el.style.display = 'block');
-          }
+        if (authToken && currentUser) {
+            // Update UI for logged in user
+            document.querySelectorAll('.logged-out-only').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.logged-in-only').forEach(el => el.style.display = 'block');
+            
+            // Update navbar buttons
+            if (navLoginButton) navLoginButton.style.display = 'none';
+            if (navRegisterButton) navRegisterButton.style.display = 'none';
+            if (navLogoutButton) navLogoutButton.style.display = 'block';
+            
+            // Update user info display
+            document.querySelectorAll('.user-name').forEach(el => {
+                el.textContent = `${currentUser.first_name} ${currentUser.last_name}`;
+            });
+            
+            // Show different nav based on role
+            if (currentUser.role === 'instructor') {
+                document.querySelectorAll('.instructor-only').forEach(el => el.style.display = 'block');
+                document.querySelectorAll('.student-only').forEach(el => el.style.display = 'none');
+            } else {
+                document.querySelectorAll('.instructor-only').forEach(el => el.style.display = 'none');
+                document.querySelectorAll('.student-only').forEach(el => el.style.display = 'block');
+            }
             return true;
-      } else {
-        // Update UI for logged out user
-        document.querySelectorAll('.logged-out-only').forEach(el => el.style.display = 'block');
-        document.querySelectorAll('.logged-in-only').forEach(el => el.style.display = 'none');
-        document.querySelectorAll('.instructor-only').forEach(el => el.style.display = 'none');
-        document.querySelectorAll('.student-only').forEach(el => el.style.display = 'none');
+        } else {
+            // Update UI for logged out user
+            document.querySelectorAll('.logged-out-only').forEach(el => el.style.display = 'block');
+            document.querySelectorAll('.logged-in-only').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.instructor-only').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.student-only').forEach(el => el.style.display = 'none');
+            
+            // Update navbar buttons
+            if (navLoginButton) navLoginButton.style.display = 'block';
+            if (navRegisterButton) navRegisterButton.style.display = 'block';
+            if (navLogoutButton) navLogoutButton.style.display = 'none';
+            
             return false;
         }
     }
@@ -98,52 +113,52 @@ document.addEventListener('DOMContentLoaded', function() {
                 e.preventDefault();
             }
             
-        const email = document.getElementById('txtStudentLoginEmail').value;
-        const password = document.getElementById('txtStudentLoginPassword').value;
-        
-        if (!email || !password) {
+            const email = document.getElementById('txtStudentLoginEmail').value;
+            const password = document.getElementById('txtStudentLoginPassword').value;
+            
+            if (!email || !password) {
                 showError('Please enter both email and password');
-          return;
-        }
-        
-        try {
-          const response = await fetch(`${API_URL}/users/login`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ email, password })
-          });
-          
-          const data = await response.json();
-          
-          if (!response.ok) {
-            throw new Error(data.message || 'Login failed');
-          }
-          
-          // Store token and user data
-          localStorage.setItem('authToken', data.token);
-          localStorage.setItem('currentUser', JSON.stringify(data.user));
-          authToken = data.token;
-          currentUser = data.user;
-          
-          // Update UI
-          checkAuth();
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/users/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.message || 'Login failed');
+                }
+                
+                // Store token and user data
+                localStorage.setItem('authToken', data.token);
+                localStorage.setItem('currentUser', JSON.stringify(data.user));
+                authToken = data.token;
+                currentUser = data.user;
+                
+                // Update UI
+                checkAuth();
                 
                 // Show success message
                 showSuccess(`Welcome back, ${data.user.first_name}!`);
-          
-          // Redirect based on role
-          if (data.user.role === 'instructor') {
-                    navigateToSection('faculty-dashboard', null);
-          } else {
-                    navigateToSection('student-dashboard', null);
-          }
-          
-        } catch (error) {
+                
+                // Redirect based on role
+                if (data.user.role === 'instructor') {
+                    navigateToSection('faculty-dashboard');
+                } else {
+                    navigateToSection('student-dashboard');
+                }
+                
+            } catch (error) {
                 showError(error.message || 'Login failed. Please try again.');
-        }
-      });
+            }
+        });
     }
   
     // Handle student registration form submission
@@ -408,6 +423,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
+            // Set the current course ID
+            currentCourseId = courseId;
+
             const response = await fetch(`${API_URL}/courses/${courseId}`, {
                 headers: {
                     'Authorization': `Bearer ${authToken}`,
@@ -453,6 +471,11 @@ document.addEventListener('DOMContentLoaded', function() {
                         </td>
                     `;
                     studentList.appendChild(row);
+                });
+
+                // Add event listeners to remove buttons
+                document.querySelectorAll('.remove-student').forEach(button => {
+                    button.addEventListener('click', () => courseManagement.removeStudentFromCourse(button.dataset.studentId));
                 });
             }
 
@@ -616,6 +639,197 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error deleting team:', error);
             showError('Error deleting team: ' + error.message);
         }
+    },
+
+    // Show enrollment modal
+    showEnrollmentModal: async (courseId) => {
+        try {
+            if (!checkAuth()) {
+                showError('Please log in to manage enrollment');
+                return;
+            }
+
+            // Set the current course ID
+            currentCourseId = courseId;
+
+            // Load available and enrolled students
+            await courseManagement.loadAvailableStudents();
+            await courseManagement.loadEnrolledStudents(courseId);
+
+            // Show modal
+            const modal = new bootstrap.Modal(document.getElementById('enrollmentModal'));
+            modal.show();
+        } catch (error) {
+            console.error('Error showing enrollment modal:', error);
+            showError('Error showing enrollment modal: ' + error.message);
+        }
+    },
+
+    // Load available students (not enrolled in the course)
+    loadAvailableStudents: async () => {
+        try {
+            const response = await fetch(`${API_URL}/users/students`, {
+                headers: {
+                    'Authorization': `Bearer ${authToken}`,
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to load available students');
+            }
+
+            const data = await response.json();
+            const students = data.students;
+            const availableStudentsList = document.getElementById('availableStudentsList');
+            availableStudentsList.innerHTML = '';
+
+            if (!students || students.length === 0) {
+                availableStudentsList.innerHTML = `
+                    <tr>
+                        <td colspan="3" class="text-center">
+                            <div class="alert alert-info">
+                                No available students found.
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            students.forEach(student => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${student.first_name} ${student.last_name}</td>
+                    <td>${student.email}</td>
+                    <td>
+                        <button class="btn btn-sm btn-success add-student" data-student-id="${student.id}">
+                            Add to Course
+                        </button>
+                    </td>
+                `;
+                availableStudentsList.appendChild(row);
+            });
+
+            // Add event listeners to add buttons
+            document.querySelectorAll('.add-student').forEach(button => {
+                button.addEventListener('click', () => courseManagement.addStudentToCourse(button.dataset.studentId));
+            });
+        } catch (error) {
+            console.error('Error loading available students:', error);
+            showError('Error loading available students: ' + error.message);
+        }
+    },
+
+    // Load enrolled students
+    loadEnrolledStudents: async (courseId) => {
+        try {
+            const response = await fetch(`${API_URL}/courses/${courseId}/students`, {
+                headers: {
+                    'Authorization': `Bearer ${authToken}`,
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to load enrolled students');
+            }
+
+            const data = await response.json();
+            const enrolledStudentsList = document.getElementById('enrolledStudentsList');
+            enrolledStudentsList.innerHTML = '';
+
+            if (!data.students || data.students.length === 0) {
+                enrolledStudentsList.innerHTML = `
+                    <tr>
+                        <td colspan="3" class="text-center">
+                            <div class="alert alert-info">
+                                No students enrolled in this course.
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            data.students.forEach(student => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${student.first_name} ${student.last_name}</td>
+                    <td>${student.email}</td>
+                    <td>
+                        <button class="btn btn-sm btn-danger remove-student" data-student-id="${student.id}">
+                            Remove
+                        </button>
+                    </td>
+                `;
+                enrolledStudentsList.appendChild(row);
+            });
+
+            // Add event listeners to remove buttons
+            document.querySelectorAll('.remove-student').forEach(button => {
+                button.addEventListener('click', () => courseManagement.removeStudentFromCourse(button.dataset.studentId));
+            });
+        } catch (error) {
+            console.error('Error loading enrolled students:', error);
+            showError('Error loading enrolled students: ' + error.message);
+        }
+    },
+
+    // Add student to course
+    addStudentToCourse: async (studentId) => {
+        try {
+            const response = await fetch(`${API_URL}/courses/${currentCourseId}/students`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${authToken}`,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ student_id: studentId })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to add student to course');
+            }
+
+            showSuccess('Student added to course successfully');
+            await courseManagement.loadAvailableStudents();
+            await courseManagement.loadEnrolledStudents(currentCourseId);
+            await courseManagement.loadCourses(); // Refresh course list
+        } catch (error) {
+            console.error('Error adding student to course:', error);
+            showError('Error adding student to course: ' + error.message);
+        }
+    },
+
+    // Remove student from course
+    removeStudentFromCourse: async (studentId) => {
+        try {
+            if (!currentCourseId) {
+                throw new Error('No course selected');
+            }
+
+            const response = await fetch(`${API_URL}/courses/${currentCourseId}/students/${studentId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${authToken}`,
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to remove student from course');
+            }
+
+            showSuccess('Student removed from course successfully');
+            await courseManagement.loadAvailableStudents();
+            await courseManagement.loadEnrolledStudents(currentCourseId);
+            await courseManagement.loadCourses(); // Refresh course list
+        } catch (error) {
+            console.error('Error removing student from course:', error);
+            showError('Error removing student from course: ' + error.message);
+        }
     }
 };
 
@@ -683,6 +897,63 @@ document.addEventListener('DOMContentLoaded', function() {
         manageCoursesBtn.addEventListener('click', () => {
             navigateToSection('manage-courses');
             courseManagement.loadCourses();
+        });
+    }
+
+    // Add event listener for enrollment management button
+    document.getElementById('btnManageEnrollment').addEventListener('click', () => {
+        courseManagement.showEnrollmentModal(currentCourseId);
+    });
+
+    // Add search functionality
+    document.getElementById('btnSearchStudent').addEventListener('click', () => {
+        const searchTerm = document.getElementById('searchStudent').value.toLowerCase();
+        const rows = document.querySelectorAll('#availableStudentsList tr');
+        
+        rows.forEach(row => {
+            const name = row.querySelector('td:first-child')?.textContent.toLowerCase() || '';
+            const email = row.querySelector('td:nth-child(2)')?.textContent.toLowerCase() || '';
+            
+            if (name.includes(searchTerm) || email.includes(searchTerm)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+
+    // Add event listeners for faculty dashboard buttons
+    if (document.getElementById('btnManageCourses')) {
+        document.getElementById('btnManageCourses').addEventListener('click', function() {
+            navigateToSection('manage-courses');
+        });
+    }
+
+    if (document.getElementById('btnManageReviews')) {
+        document.getElementById('btnManageReviews').addEventListener('click', function() {
+            navigateToSection('manage-reviews');
+        });
+    }
+
+    if (document.getElementById('btnManageReports')) {
+        document.getElementById('btnManageReports').addEventListener('click', function() {
+            navigateToSection('manage-reports');
+        });
+    }
+
+    if (document.getElementById('btnFacultyLogout')) {
+        document.getElementById('btnFacultyLogout').addEventListener('click', function() {
+            // Clear auth data
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('currentUser');
+            authToken = null;
+            currentUser = null;
+            
+            // Update UI
+            checkAuth();
+            
+            // Redirect to home
+            navigateToSection('landing-view');
         });
     }
   });

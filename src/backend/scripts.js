@@ -175,20 +175,22 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // --- JWT Authentication Functions ---
   function saveToken(token) {
-    localStorage.setItem('jwt_token', token);
+    localStorage.setItem('authToken', token);
   }
 
   function getToken() {
-    return localStorage.getItem('jwt_token');
+    return localStorage.getItem('authToken');
   }
 
   function removeToken() {
-    localStorage.removeItem('jwt_token');
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('currentUser');
   }
 
   function isAuthenticated() {
     const token = getToken();
-    return token !== null;
+    const user = localStorage.getItem('currentUser');
+    return token !== null && user !== null;
   }
 
   function checkAuthState() {

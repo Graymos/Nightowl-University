@@ -54,7 +54,6 @@ Nightowl-University/
 ## Development Notes
 - All sensitive actions are protected by JWT.
 - Passwords are securely hashed with bcryptjs.
-- The project uses Cursor AI rules for code quality, security, and efficiency.
 
 ## License
 See the license header in each source file.

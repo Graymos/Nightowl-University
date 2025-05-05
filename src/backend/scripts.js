@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   window.addEventListener('scroll', updateParallax);
 
-  
+
 
   // Dummy toggles for forms
   document.getElementById('btnShowLogin').addEventListener('click', function () {

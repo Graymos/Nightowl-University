@@ -4,8 +4,10 @@ document.addEventListener('DOMContentLoaded', function () {
   checkAuthState(); // Check authentication state on page load
 
   // Navigation: Hide all sections/forms and show the target section
-  window.navigateToSection = function (section) {
-      event.preventDefault();
+  window.navigateToSection = function (section, event) {
+      if (event) {
+          event.preventDefault();
+      }
       document.querySelectorAll('section, form').forEach(el => {
           el.style.display = 'none';
       });
@@ -395,59 +397,6 @@ document.addEventListener('DOMContentLoaded', function () {
       Swal.close();
       btn.disabled = false;
       await Swal.fire('Error', 'Registration failed. Please try again later.', 'error');
-    }
-  });
-
-  // --- Login Form Submission ---
-  document.getElementById('btnStudentLoginSubmit').addEventListener('click', async function () {
-    // Clear previous errors
-    clearFieldError('txtStudentLoginEmail');
-    clearFieldError('txtStudentLoginPassword');
-
-    const email = document.getElementById('txtStudentLoginEmail').value.trim();
-    const password = document.getElementById('txtStudentLoginPassword').value;
-
-    let hasError = false;
-    if (!email) {
-      showFieldError('txtStudentLoginEmail', 'Email is required.');
-      hasError = true;
-    }
-    if (!password) {
-      showFieldError('txtStudentLoginPassword', 'Password is required.');
-      hasError = true;
-    }
-    if (hasError) return;
-
-    try {
-      const res = await fetch('http://localhost:3001/api/users/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
-      const data = await res.json();
-      if (res.ok) {
-        // Save the JWT token
-        if (data.token) {
-          saveToken(data.token);
-        }
-        Swal.fire('Success', `Login successful! Welcome, ${data.user.first_name}.`, 'success');
-        checkAuthState(); // Update navigation bar
-        // Redirect to appropriate dashboard based on user role
-        setTimeout(() => {
-          document.querySelectorAll('section, form').forEach(el => {
-            el.style.display = 'none';
-          });
-          if (data.user.role === 'student') {
-            document.getElementById('student-dashboard').style.display = 'block';
-          } else if (data.user.role === 'faculty' || data.user.role === 'instructor') {
-            document.getElementById('faculty-dashboard').style.display = 'block';
-          }
-        }, 1000);
-      } else {
-        Swal.fire('Error', data.message || 'Login failed.', 'error');
-      }
-    } catch (err) {
-      Swal.fire('Error', 'Login failed. Please try again later.', 'error');
     }
   });
 

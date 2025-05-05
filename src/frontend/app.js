@@ -1,21 +1,43 @@
 // Frontend JavaScript for interacting with the API
 document.addEventListener('DOMContentLoaded', function() {
     // API URL
-    const API_URL = 'http://localhost:3000/api';
+    const API_URL = 'http://localhost:3001/api';
     
     // Token storage
     let authToken = localStorage.getItem('authToken');
     let currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    let currentCourseId = null;
+  
+    // Utility functions for showing notifications
+    function showSuccess(message) {
+        Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: message,
+            timer: 2000,
+            showConfirmButton: false
+        });
+    }
+
+    function showError(message) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: message
+        });
+    }
   
     // Check if user is logged in
     function checkAuth() {
-      if (authToken) {
+        authToken = localStorage.getItem('authToken');
+        currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        
+        if (authToken && currentUser) {
         // Update UI for logged in user
         document.querySelectorAll('.logged-out-only').forEach(el => el.style.display = 'none');
         document.querySelectorAll('.logged-in-only').forEach(el => el.style.display = 'block');
         
         // Update user info display
-        if (currentUser) {
           document.querySelectorAll('.user-name').forEach(el => {
             el.textContent = `${currentUser.first_name} ${currentUser.last_name}`;
           });
@@ -28,24 +50,59 @@ document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('.instructor-only').forEach(el => el.style.display = 'none');
             document.querySelectorAll('.student-only').forEach(el => el.style.display = 'block');
           }
-        }
+            return true;
       } else {
         // Update UI for logged out user
         document.querySelectorAll('.logged-out-only').forEach(el => el.style.display = 'block');
         document.querySelectorAll('.logged-in-only').forEach(el => el.style.display = 'none');
         document.querySelectorAll('.instructor-only').forEach(el => el.style.display = 'none');
         document.querySelectorAll('.student-only').forEach(el => el.style.display = 'none');
-      }
+            return false;
+        }
     }
+  
+    // Navigation function
+    window.navigateToSection = function(sectionId) {
+        // Check authentication before showing protected sections
+        if (sectionId === 'manage-courses' || sectionId === 'manage-reviews' || sectionId === 'manage-reports') {
+            if (!checkAuth()) {
+                showError('Please log in to access this section');
+                navigateToSection('forms-section');
+                return;
+            }
+        }
+
+        // Hide all sections
+        document.querySelectorAll('section').forEach(section => {
+            section.style.display = 'none';
+        });
+        document.getElementById('landing-view').style.display = 'none';
+        document.getElementById('forms-section').style.display = 'none';
+
+        // Show the requested section
+        const targetSection = document.getElementById(sectionId);
+        if (targetSection) {
+            targetSection.style.display = 'block';
+        }
+
+        // If navigating to manage-courses, load the courses
+        if (sectionId === 'manage-courses') {
+            courseManagement.loadCourses();
+        }
+    };
   
     // Handle login form submission
     if (document.getElementById('btnStudentLoginSubmit')) {
-      document.getElementById('btnStudentLoginSubmit').addEventListener('click', async function() {
+        document.getElementById('btnStudentLoginSubmit').addEventListener('click', async function(e) {
+            if (e) {
+                e.preventDefault();
+            }
+            
         const email = document.getElementById('txtStudentLoginEmail').value;
         const password = document.getElementById('txtStudentLoginPassword').value;
         
         if (!email || !password) {
-          alert('Please enter both email and password');
+                showError('Please enter both email and password');
           return;
         }
         
@@ -72,16 +129,19 @@ document.addEventListener('DOMContentLoaded', function() {
           
           // Update UI
           checkAuth();
+                
+                // Show success message
+                showSuccess(`Welcome back, ${data.user.first_name}!`);
           
           // Redirect based on role
           if (data.user.role === 'instructor') {
-            navigateToSection('instructor-dashboard');
+                    navigateToSection('faculty-dashboard', null);
           } else {
-            navigateToSection('student-dashboard');
+                    navigateToSection('student-dashboard', null);
           }
           
         } catch (error) {
-          alert(`Error: ${error.message}`);
+                showError(error.message || 'Login failed. Please try again.');
         }
       });
     }
@@ -229,5 +289,400 @@ document.addEventListener('DOMContentLoaded', function() {
     // Check auth status on page load
     checkAuth();
 
+    // Course Management Functions
+    const courseManagement = {
+      // Create a new course
+      createCourse: async (courseData) => {
+        try {
+          if (!checkAuth()) {
+            showError('Please log in to create courses');
+            return;
+          }
 
+          const response = await fetch(`${API_URL}/courses`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${authToken}`
+            },
+            body: JSON.stringify(courseData)
+          });
+
+          if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.message || 'Failed to create course');
+          }
+
+          const data = await response.json();
+          showSuccess('Course created successfully');
+          await courseManagement.loadCourses();
+          return data;
+        } catch (error) {
+          showError('Error creating course: ' + error.message);
+          throw error;
+        }
+      },
+
+      // Load all courses for the instructor
+      loadCourses: async () => {
+        try {
+          if (!checkAuth()) {
+            showError('Please log in to view courses');
+            return;
+          }
+
+          const response = await fetch(`${API_URL}/courses/instructor`, {
+            headers: {
+              'Authorization': `Bearer ${authToken}`,
+              'Accept': 'application/json'
+            }
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to load courses');
+          }
+
+          const data = await response.json();
+          
+          if (!data || !Array.isArray(data.courses)) {
+            throw new Error('Invalid response format from server');
+          }
+
+          const courseList = document.getElementById('courseList');
+          courseList.innerHTML = '';
+
+          if (data.courses.length === 0) {
+            courseList.innerHTML = `
+                <tr>
+                    <td colspan="5" class="text-center">
+                        <div class="alert alert-info">
+                            No courses found. Create your first course using the form above.
+                        </div>
+                    </td>
+                </tr>
+            `;
+            return;
+          }
+
+          data.courses.forEach(course => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${course.title}</td>
+              <td>${course.code}</td>
+              <td>${course.student_count || 0}</td>
+              <td>${course.team_count || 0}</td>
+              <td>
+                <button class="btn btn-sm btn-primary view-course" data-course-id="${course.id}">View Details</button>
+              </td>
+            `;
+            courseList.appendChild(row);
+          });
+
+          // Add event listeners to view buttons
+          document.querySelectorAll('.view-course').forEach(button => {
+            button.addEventListener('click', () => courseManagement.showCourseDetails(button.dataset.courseId));
+          });
+        } catch (error) {
+          console.error('Error loading courses:', error);
+          showError('Error loading courses: ' + error.message);
+          
+          const courseList = document.getElementById('courseList');
+          courseList.innerHTML = `
+                <tr>
+                    <td colspan="5" class="text-center">
+                        <div class="alert alert-warning">
+                            Unable to load courses. Please try again later.
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
+      },
+
+      // Show course details in modal
+      showCourseDetails: async (courseId) => {
+        try {
+            if (!checkAuth()) {
+                showError('Please log in to view course details');
+                return;
+            }
+
+            const response = await fetch(`${API_URL}/courses/${courseId}`, {
+                headers: {
+                    'Authorization': `Bearer ${authToken}`,
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to load course details');
+            }
+
+            const data = await response.json();
+            const course = data.course;
+            const students = data.students || [];
+
+            // Update modal title
+            document.getElementById('courseDetailsModalLabel').textContent = course.title;
+
+            // Populate student list
+            const studentList = document.getElementById('studentList');
+            studentList.innerHTML = '';
+
+            if (students.length === 0) {
+                studentList.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="text-center">
+                            <div class="alert alert-info">
+                                No students enrolled in this course yet.
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            } else {
+                students.forEach(student => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${student.first_name} ${student.last_name}</td>
+                        <td>${student.email}</td>
+                        <td>${student.team_name || 'Not Assigned'}</td>
+                        <td>
+                            <button class="btn btn-sm btn-danger remove-student" data-student-id="${student.id}">Remove</button>
+                        </td>
+                    `;
+                    studentList.appendChild(row);
+                });
+            }
+
+            // Load teams
+            await courseManagement.loadTeams(courseId);
+
+            // Show modal
+            const modal = new bootstrap.Modal(document.getElementById('courseDetailsModal'));
+            modal.show();
+        } catch (error) {
+            console.error('Error loading course details:', error);
+            showError('Error loading course details: ' + error.message);
+        }
+    },
+
+    // Load teams for a course
+    loadTeams: async (courseId) => {
+        try {
+            if (!checkAuth()) {
+                showError('Please log in to view teams');
+                return;
+            }
+
+            const response = await fetch(`${API_URL}/courses/${courseId}/teams`, {
+                headers: {
+                    'Authorization': `Bearer ${authToken}`,
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to load teams');
+            }
+
+            const data = await response.json();
+            const teamList = document.getElementById('teamList');
+            teamList.innerHTML = '';
+
+            if (!data.teams || data.teams.length === 0) {
+                teamList.innerHTML = `
+                    <tr>
+                        <td colspan="3" class="text-center">
+                            <div class="alert alert-info">
+                                No teams created for this course yet.
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            data.teams.forEach(team => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${team.name}</td>
+                    <td>${team.member_count || 0} members</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary view-team" data-team-id="${team.id}">View Members</button>
+                        <button class="btn btn-sm btn-danger delete-team" data-team-id="${team.id}">Delete</button>
+                    </td>
+                `;
+                teamList.appendChild(row);
+            });
+
+            // Add event listeners to team buttons
+            document.querySelectorAll('.view-team').forEach(button => {
+                button.addEventListener('click', () => courseManagement.showTeamMembers(button.dataset.teamId));
+            });
+
+            document.querySelectorAll('.delete-team').forEach(button => {
+                button.addEventListener('click', () => courseManagement.deleteTeam(button.dataset.teamId));
+            });
+        } catch (error) {
+            console.error('Error loading teams:', error);
+            showError('Error loading teams: ' + error.message);
+        }
+    },
+
+    // Show team members
+    showTeamMembers: async (teamId) => {
+        try {
+            if (!checkAuth()) {
+                showError('Please log in to view team members');
+                return;
+            }
+
+            const response = await fetch(`${API_URL}/courses/teams/${teamId}/members`, {
+                headers: {
+                    'Authorization': `Bearer ${authToken}`,
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to load team members');
+            }
+
+            const data = await response.json();
+            const members = data.members || [];
+
+            // Show members in a modal or alert
+            if (members.length === 0) {
+                showError('No members in this team');
+                return;
+            }
+
+            const memberList = members.map(member => 
+                `${member.first_name} ${member.last_name} (${member.email})`
+            ).join('\n');
+
+            Swal.fire({
+                title: 'Team Members',
+                html: `<pre>${memberList}</pre>`,
+                confirmButtonText: 'Close'
+            });
+        } catch (error) {
+            console.error('Error loading team members:', error);
+            showError('Error loading team members: ' + error.message);
+        }
+    },
+
+    // Delete a team
+    deleteTeam: async (teamId) => {
+        try {
+            if (!checkAuth()) {
+                showError('Please log in to delete teams');
+                return;
+            }
+
+            const result = await Swal.fire({
+                title: 'Delete Team',
+                text: 'Are you sure you want to delete this team?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete it',
+                cancelButtonText: 'No, keep it'
+            });
+
+            if (!result.isConfirmed) {
+                return;
+            }
+
+            const response = await fetch(`${API_URL}/courses/teams/${teamId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${authToken}`,
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to delete team');
+            }
+
+            showSuccess('Team deleted successfully');
+            await courseManagement.loadTeams(currentCourseId);
+        } catch (error) {
+            console.error('Error deleting team:', error);
+            showError('Error deleting team: ' + error.message);
+        }
+    }
+};
+
+    // Event Listeners for Course Management
+    const courseForm = document.getElementById('frmCourse');
+    if (courseForm) {
+        courseForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const courseData = {
+                title: document.getElementById('txtCourseName').value,
+                code: document.getElementById('txtCourseCode').value,
+                description: document.getElementById('txtCourseDescription').value
+            };
+
+            // Basic validation
+            if (!courseData.title || !courseData.code) {
+                showError('Please fill in all required fields');
+                return;
+            }
+
+            try {
+                await courseManagement.createCourse(courseData);
+                courseForm.reset();
+            } catch (error) {
+                console.error('Error creating course:', error);
+            }
+        });
+    }
+
+    // Create team button
+    const createTeamBtn = document.getElementById('btnCreateTeam');
+    if (createTeamBtn) {
+        createTeamBtn.addEventListener('click', () => {
+            const modal = new bootstrap.Modal(document.getElementById('createTeamModal'));
+            modal.show();
+        });
+    }
+
+    // Create team form
+    const teamForm = document.getElementById('frmCreateTeam');
+    if (teamForm) {
+        teamForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const teamData = {
+                name: document.getElementById('txtTeamName').value,
+                members: Array.from(document.querySelectorAll('#teamMemberList input:checked')).map(input => input.value)
+            };
+            try {
+                await courseManagement.createTeam(currentCourseId, teamData);
+                teamForm.reset();
+                const modal = bootstrap.Modal.getInstance(document.getElementById('createTeamModal'));
+                modal.hide();
+                await courseManagement.loadTeams(currentCourseId);
+            } catch (error) {
+                console.error('Error creating team:', error);
+            }
+        });
+    }
+
+    // Load courses when manage courses section is shown
+    const manageCoursesBtn = document.getElementById('btnManageCourses');
+    if (manageCoursesBtn) {
+        manageCoursesBtn.addEventListener('click', () => {
+            navigateToSection('manage-courses');
+            courseManagement.loadCourses();
+        });
+    }
   });

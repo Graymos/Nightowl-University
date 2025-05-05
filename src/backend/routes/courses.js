@@ -70,6 +70,32 @@ router.get('/:id', authenticate, async (req, res) => {
   }
 });
 
+// Remove a student from a course (instructor only)
+router.delete('/:id/students/:studentId', authenticate, isInstructor, async (req, res) => {
+  try {
+    const courseId = req.params.id;
+    const studentId = req.params.studentId;
+
+    // Check if course exists and instructor owns it
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+    
+    if (course.instructor_id !== req.user.id) {
+      return res.status(403).json({ message: 'Not authorized to modify this course' });
+    }
+
+    // Remove student from course
+    await Course.removeStudent(courseId, studentId);
+    
+    res.json({ message: 'Student removed from course successfully' });
+  } catch (error) {
+    console.error('Error removing student from course:', error);
+    res.status(500).json({ message: 'Error removing student from course', error: error.message });
+  }
+});
+
 // Enroll a student in a course
 router.post('/:id/enroll', authenticate, async (req, res) => {
   try {
@@ -101,7 +127,7 @@ router.post('/:id/enroll', authenticate, async (req, res) => {
 router.post('/:id/teams', authenticate, isInstructor, async (req, res) => {
   try {
     const courseId = req.params.id;
-    const { name } = req.body;
+    const { name, members } = req.body;
 
     // Check if course exists and instructor owns it
     const course = await Course.findById(courseId);
@@ -119,6 +145,13 @@ router.post('/:id/teams', authenticate, isInstructor, async (req, res) => {
       course_id: courseId
     });
 
+    // Add team members if provided
+    if (members && members.length > 0) {
+      for (const studentId of members) {
+        await Team.addMember(newTeam.id, studentId);
+      }
+    }
+
     res.status(201).json({
       message: 'Team created successfully',
       team: newTeam
@@ -126,27 +159,6 @@ router.post('/:id/teams', authenticate, isInstructor, async (req, res) => {
   } catch (error) {
     console.error('Error creating team:', error);
     res.status(500).json({ message: 'Error creating team', error: error.message });
-  }
-});
-
-// Add student to a team
-router.post('/teams/:teamId/members', authenticate, isInstructor, async (req, res) => {
-  try {
-    const teamId = req.params.teamId;
-    const { studentId } = req.body;
-
-    // Add student to team
-    await Team.addMember(teamId, studentId);
-    
-    res.status(201).json({ message: 'Student added to team successfully' });
-  } catch (error) {
-    // Handle duplicate team member
-    if (error.message.includes('UNIQUE constraint failed')) {
-      return res.status(400).json({ message: 'Student is already a member of this team' });
-    }
-    
-    console.error('Error adding student to team:', error);
-    res.status(500).json({ message: 'Error adding student to team', error: error.message });
   }
 });
 
@@ -162,6 +174,32 @@ router.get('/:id/teams', authenticate, async (req, res) => {
   } catch (error) {
     console.error('Error fetching teams:', error);
     res.status(500).json({ message: 'Error fetching teams', error: error.message });
+  }
+});
+
+// Delete a team (instructor only)
+router.delete('/teams/:teamId', authenticate, isInstructor, async (req, res) => {
+  try {
+    const teamId = req.params.teamId;
+    
+    // Check if team exists and instructor owns the course
+    const team = await Team.findById(teamId);
+    if (!team) {
+      return res.status(404).json({ message: 'Team not found' });
+    }
+
+    const course = await Course.findById(team.course_id);
+    if (course.instructor_id !== req.user.id) {
+      return res.status(403).json({ message: 'Not authorized to delete this team' });
+    }
+
+    // Delete team
+    await Team.delete(teamId);
+    
+    res.json({ message: 'Team deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting team:', error);
+    res.status(500).json({ message: 'Error deleting team', error: error.message });
   }
 });
 

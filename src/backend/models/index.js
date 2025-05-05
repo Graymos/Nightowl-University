@@ -55,10 +55,18 @@ const Course = {
 
   findByInstructor: (instructorId) => {
     return new Promise((resolve, reject) => {
-      db.all('SELECT * FROM courses WHERE instructor_id = ?', [instructorId], (err, rows) => {
-        if (err) reject(err);
-        resolve(rows);
-      });
+      db.all(`
+        SELECT c.*, 
+          (SELECT COUNT(*) FROM enrollments WHERE course_id = c.id) as student_count,
+          (SELECT COUNT(*) FROM teams WHERE course_id = c.id) as team_count
+        FROM courses c 
+        WHERE c.instructor_id = ?`,
+        [instructorId],
+        (err, rows) => {
+          if (err) reject(err);
+          resolve(rows);
+        }
+      );
     });
   },
 
@@ -96,14 +104,30 @@ const Course = {
   getStudents: (courseId) => {
     return new Promise((resolve, reject) => {
       db.all(
-        `SELECT u.id, u.first_name, u.middle_name, u.last_name, u.email, u.phone_number, u.discord_id, u.teams_id
+        `SELECT u.id, u.first_name, u.middle_name, u.last_name, u.email, u.phone_number, u.discord_id,
+          t.name as team_name
         FROM users u
         JOIN enrollments e ON u.id = e.student_id
+        LEFT JOIN team_members tm ON u.id = tm.student_id
+        LEFT JOIN teams t ON tm.team_id = t.id
         WHERE e.course_id = ? AND u.role = 'student'`,
         [courseId],
         (err, rows) => {
           if (err) reject(err);
           resolve(rows);
+        }
+      );
+    });
+  },
+
+  removeStudent: (courseId, studentId) => {
+    return new Promise((resolve, reject) => {
+      db.run(
+        'DELETE FROM enrollments WHERE course_id = ? AND student_id = ?',
+        [courseId, studentId],
+        function(err) {
+          if (err) reject(err);
+          resolve({ course_id: courseId, student_id: studentId });
         }
       );
     });

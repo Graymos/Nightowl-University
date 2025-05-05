@@ -4,6 +4,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const path = require('path');
 const { setupDatabase } = require('./config/database');
+const routes = require('./routes');
 
 const app = express();
 const PORT = 3001;
@@ -16,9 +17,8 @@ app.use(express.static(path.join(__dirname, '../frontend')));
 // Initialize database
 setupDatabase();
 
-// Use the users router for all user-related endpoints
-const usersRouter = require('./routes/users');
-app.use('/api/users', usersRouter);
+// Use the API routes
+app.use('/api', routes);
 
 // Serve the main HTML file for all other routes (SPA)
 app.get('*', (req, res) => {

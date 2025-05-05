@@ -49,11 +49,7 @@ document.addEventListener('DOMContentLoaded', function () {
       document.getElementById('formLogin').style.display = 'none';
       document.getElementById('formStudent').style.display = 'block';
   });
-  document.getElementById('btnShowRegisterFaculty').addEventListener('click', function () {
-      document.getElementById('formLogin').style.display = 'none';
-      document.getElementById('formStudent').style.display = 'none';
-      document.getElementById('formFaculty').style.display = 'block';
-  });
+
   document.getElementById('btnShowLoginFaculty').addEventListener('click', function () {
       document.getElementById('formLogin').style.display = 'block';
       document.getElementById('formStudent').style.display = 'none';

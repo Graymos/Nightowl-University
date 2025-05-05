@@ -219,6 +219,28 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
+  document.getElementById('btnStudentLogout').addEventListener('click', function (event) {
+    event.preventDefault();
+    removeToken();
+    checkAuthState();
+    
+    // Redirect to index.html without hash
+    Swal.fire('Success', 'You have been logged out.', 'success').then(() => {
+      window.location.href = 'index.html';
+    });
+  });
+
+  document.getElementById('btnFacultyLogout').addEventListener('click', function (event) {
+    event.preventDefault();
+    removeToken();
+    checkAuthState();
+    
+    // Redirect to index.html without hash
+    Swal.fire('Success', 'You have been logged out.', 'success').then(() => {
+      window.location.href = 'index.html';
+    });
+  });
+
   // --- Helper: Show or clear error messages below fields ---
   function showFieldError(inputId, message) {
     let input = document.getElementById(inputId);

@@ -255,13 +255,18 @@
       <p>Use the form below to create a new review.</p>
       <form id="frmCreateReview" aria-label="Create review form" >
         <div class="mb-3">
-            <label for="txtReviewTitle" class="form-label">Review Title</label>
-            <input type="text" id="txtReviewTitle" class="form-control" placeholder="e.g., Great Course!" aria-required="true">
+            <label for="txtReviewCourse" class="form-label">Course</label>
+            <input type="text" id="txtReviewCourse" class="form-control" placeholder="e.g., 3100-F23" aria-required="true">
         </div>
 
         <div class="mb-3">
-            <label for="txtReviewContent" class="form-label">Review Content</label>
-            <textarea id="txtReviewContent" class="form-control" rows="4" placeholder="Write your review here..." aria-required="true"></textarea>
+            <label for="txtReviewTitle" class="form-label">Review Title</label>
+            <input type="text" id="txtReviewTitle" class="form-control" placeholder="e.g., Midterm Review" aria-required="true">
+        </div>
+
+        <div class="mb-3">
+            <label for="txtReviewInstructions" class="form-label">Review Instructions</label>
+            <textarea id="txtReviewInstructions" class="form-control" rows="4" placeholder="Write your review instructions here..." aria-required="true"></textarea>
         </div>
 
         <button class="btn btn-primary mb-2" type="submit" aria-label="Create review button">Create Review</button>
@@ -269,6 +274,13 @@
       <h2 class="mt-2">Schedule Review</h2>
     <p class="mb-4">Set a start and end date for a review session.</p>
     <form id="frmScheduleReview" aria-label="Schedule review form">
+        <div class="mb-3">
+          <select id="selReview" class="form-control mt-2">
+            <option value="" selected disabled>Select Review</option>
+            <option value="stdTeamReview">Standard Teammate Review</option>
+          </select>
+        </div>
+
         <div class="mb-3">
           <label for="dtStart" class="form-label">Start Date</label>
           <input type="date" class="form-control" id="dtStart">

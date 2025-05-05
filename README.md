@@ -24,7 +24,6 @@ Nightowl-University/
 │   ├── backend/       # Express server, routes, models, DB
 │   └── server/        # (Additional backend logic)
 ├── images/            # Project images and assets
-├── .cursor/           # Cursor AI rules
 ├── package.json       # Project dependencies and scripts
 └── README.md          # This file
 ```

@@ -501,19 +501,40 @@
     </div>
 
   </section>
-
-  <section id="manage-reports" style="display: none; margin-top: 150px !important;">
-
-    <div class="container p-3" style="background: #fff; border-radius: 5px; margin-bottom: 64px; padding: 32px 64px !important;">
-      <h2 class="text-center mb-2" style="color: #2c3e50;">Manage Reports</h2>
-      <form id="frmReport" style="display: block;">
-        <div class="mb-3">
-          <h3 class="mt-2">Class Metrics</h3>
-        </div>
-      </form>
-    </div> 
   
+  <section id="manage-reports" style="display: none; margin-top:150px;">
+    <div class="container p-3" style="background:#fff; border-radius:5px; margin-bottom:64px;">
+      <h2 class="text-center mb-2" style="color:#2c3e50;">Manage Reports</h2>
+  
+      <div class="mb-4">
+        <label for="courseSelect" class="form-label">Select Course:</label>
+        <select id="courseSelect" class="form-select">
+          <option value="" disabled selected>––– pick a course –––</option>
+        </select>
+      </div>
+  
+      <div id="classMetrics" class="mb-5">
+        <h3>Class Average Score:</h3>
+        <p><strong><span id="classAvgValue">—</span> / 100</strong></p>
+      </div>
+  
+      <div id="studentMetrics">
+        <h3>Student Averages</h3>
+        <table id="studentTable" class="table table-striped">
+          <thead>
+            <tr>
+              <th data-sort="name">Name ▲▼</th>
+              <th data-sort="average">Average ▲▼</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- rows injected here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
   </section>
+  
 
   <!-- Student Dashboard -->
   <section id="student-dashboard" style="display: none;  margin-top: 150px !important;">

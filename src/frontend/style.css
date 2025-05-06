@@ -1,10 +1,24 @@
 /* Global Resets */
 html,
 body {
+  width: 100vw;
+  max-width: 100vw;
+  min-height:100vh;
+  overflow-x: hidden !important;
   margin: 0;
   padding: 0;
-  overflow-x: hidden;
   font-family: Arial, sans-serif;
+  background: url('../../images/tntech-night-blur.jpg') center/cover no-repeat
+}
+
+.page-wrapper{
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;     /* ensures the wrapper is never shorter than screen   */
+}
+
+#view-container{
+  flex: 1 0 auto;        /* grow and shrink, but don’t force a fixed height    */
 }
 
 /* Navbar Styling */
@@ -38,6 +52,9 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
+  -webkit-box-shadow: 0px -1px 10px 5px rgba(0,0,0,0.35); 
+  box-shadow: 0px -1px 10px 5px rgba(0,0,0,0.35);
 }
 .hero-overlay {
   position: absolute;
@@ -60,19 +77,22 @@ body {
 
 /* Hero Left: Bigger, Bolder */
 .hero-left {
-  text-align: left;
+  text-align: center;
   color: #fff;
-  margin-top: 80px;
   text-shadow: 0px 2px 8px rgba(0, 0, 0, 0.25);
 }
 .hero-left h1 {
-  font-size: 4.5em;
+  font-size: clamp(1.5rem, 5vw, 3.5rem);
   font-weight: bold;
   margin-bottom: 0.3em;
+  word-break: break-word;
+  line-height: 1.1;
 }
 .hero-left h2 {
-  font-size: 3em;
+  font-size: clamp(1.1rem, 3vw, 2rem);
   font-weight: bold;
+  word-break: break-word;
+  line-height: 1.1;
 }
 
 /* Signup Box (Right Column): Skinnier & Taller */
@@ -127,7 +147,9 @@ body {
 /* Content Block for Sections (75% width, centered) */
 .content-block {
   position: relative;
-  width: 75%;
+  width: 100%;
+  max-width: 1200px;
+  box-sizing: border-box;
   margin: 0 auto;
   text-align: center;
 }
@@ -139,6 +161,7 @@ body {
   justify-content: flex-start;
   width: 100%;
   height: 100%;
+  flex-wrap: wrap;
 }
 .owl-container {
   flex: 0 0 auto;
@@ -189,18 +212,19 @@ body {
 }
 
 /* EVENT SECTION: Lighting The Quad */
-/* Span full viewport width and use flex for 60/40 layout, with image touching the screen’s right edge */
+/* Span full viewport width and use flex for 60/40 layout, with image touching the screen's right edge */
 .event-section {
-  width: 100vw;
+  width: 100%;
   overflow: hidden;
   background: #1a1a1a;
   padding: 0;
 }
 .event-flex {
   display: flex;
-  width: 100vw;
+  width: 100%;
   height: 70vh;
   background-size: cover;
+  flex-wrap: wrap;
 }
 .event-content {
   flex: 0 0 40%;
@@ -217,7 +241,7 @@ body {
   color: #ab9266;
 }
 .event-content p {
-  font-size: 1.4em;
+  font-size: clamp(1rem, 2.5vw, 1.4em);
   line-height: 1.6;
   margin-bottom: 20px;
 }
@@ -251,7 +275,7 @@ body {
 
 /* Section Titles */
 .section-title {
-  font-size: 3em;
+  font-size: clamp(1.5rem, 4vw, 3em);
   margin-bottom: 20px;
 }
 
@@ -305,6 +329,7 @@ body {
 
 /* Footer Styles */
 .site-footer {
+  flex-shrink: 0;
   background-color: #000;
   color: #ccc;
   padding: 40px 0;
@@ -342,4 +367,26 @@ body {
 }
 .gold {
   color: #ab9266;
+}
+
+/* Responsive adjustment for very small screens */
+@media (max-width: 600px) {
+  .hero {
+    min-height: 100vh;
+    height: auto;
+    padding-top: 40px;
+    padding-bottom: 40px;
+  }
+  .hero-left h1 {
+    font-size: clamp(1.2rem, 7vw, 2.2rem);
+  }
+  .hero-left h2 {
+    font-size: clamp(1rem, 5vw, 1.5rem);
+  }
+}
+
+/* Highlight invalid input fields */
+.is-invalid {
+  border-color: #dc3545 !important;
+  box-shadow: 0 0 0 0.2rem rgba(220,53,69,.25) !important;
 }

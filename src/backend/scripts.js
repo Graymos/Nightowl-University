@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', function () {
           userRole = null;
         }
       }
-      if (userRole === 'faculty' || userRole === 'instructor') {
+      if (userRole === 'instructor') {
         document.querySelectorAll('section, form').forEach(el => {
             el.style.display = 'none';
         });
@@ -350,7 +350,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     try {
       // Choose endpoint based on user type
-      const endpoint = userType === 'faculty' 
+      const endpoint = userType === 'instructor' 
         ? 'http://localhost:3001/api/users/register/faculty' 
         : 'http://localhost:3001/api/users/register/student';
       

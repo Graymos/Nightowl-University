@@ -161,68 +161,6 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     }
   
-    // Handle student registration form submission
-    if (document.getElementById('btnStudentRegisterSubmit')) {
-      document.getElementById('btnStudentRegisterSubmit').addEventListener('click', async function() {
-        const first_name = document.getElementById('txtStudentFirstname').value;
-        const middle_name = document.getElementById('txtStudentMiddlename').value;
-        const last_name = document.getElementById('txtStudentLastname').value;
-        const email = document.getElementById('txtStudentEmail').value;
-        const password = document.getElementById('txtStudentPassword').value;
-        const confirmPassword = document.getElementById('txtStudentPasswordConfirm').value;
-        const phone_number = document.getElementById('txtStudentPhoneNumber').value;
-        
-        // Basic validation
-        if (!first_name || !last_name || !email || !password) {
-          alert('Please fill in all required fields');
-          return;
-        }
-        
-        if (password !== confirmPassword) {
-          alert('Passwords do not match');
-          return;
-        }
-        
-        try {
-          const response = await fetch(`${API_URL}/users/register/student`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              first_name,
-              middle_name,
-              last_name,
-              email,
-              password,
-              phone_number
-            })
-          });
-          
-          const data = await response.json();
-          
-          if (!response.ok) {
-            throw new Error(data.message || 'Registration failed');
-          }
-          
-          // Store token and user data
-          localStorage.setItem('authToken', data.token);
-          localStorage.setItem('currentUser', JSON.stringify(data.user));
-          authToken = data.token;
-          currentUser = data.user;
-          
-          // Update UI
-          checkAuth();
-          
-          // Redirect to student dashboard
-          navigateToSection('student-dashboard');
-          
-        } catch (error) {
-          alert(`Error: ${error.message}`);
-        }
-      });
-    }
-  
     // Handle faculty registration form submission
     if (document.getElementById('btnRegisterFacultySubmit')) {
       document.getElementById('btnRegisterFacultySubmit').addEventListener('click', async function() {

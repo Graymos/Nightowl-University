@@ -313,6 +313,55 @@ const setupRoutes = (app) => {
   );
   
   /**
+   * @route   GET api/courses/:id/teams
+   * @desc    Get all teams for a course
+   * @access  Private (Instructor only)
+   */
+  app.get(
+    '/api/courses/:id/teams',
+    [authenticateJWT, instructorAuth],
+    async (req, res) => {
+      try {
+        const courseId = req.params.id;
+        // Check if course exists and belongs to instructor
+        const course = await Course.findById(db, courseId);
+        if (!course) {
+          return res.status(404).json({ message: 'Course not found' });
+        }
+        if (course.instructor_id !== req.user.id) {
+          return res.status(403).json({ message: 'Not authorized' });
+        }
+        // Get teams for course
+        const teams = await Team.getTeamsForCourse(db, courseId);
+        res.json(teams);
+      } catch (error) {
+        console.error('Get teams for course error:', error.message);
+        res.status(500).json({ message: 'Server error' });
+      }
+    }
+  );
+  
+  /**
+   * @route   GET api/teams/:id/members
+   * @desc    Get all members of a team
+   * @access  Private (Instructor only)
+   */
+  app.get(
+    '/api/teams/:id/members',
+    [authenticateJWT, instructorAuth],
+    async (req, res) => {
+      try {
+        const teamId = req.params.id;
+        const members = await Team.getTeamMembers(db, teamId);
+        res.json(members);
+      } catch (error) {
+        console.error('Get team members error:', error.message);
+        res.status(500).json({ message: 'Server error' });
+      }
+    }
+  );
+  
+  /**
    * @route   POST api/reviews/templates
    * @desc    Create a review template
    * @access  Private (Instructor only)
@@ -589,6 +638,105 @@ const setupRoutes = (app) => {
       });
     } catch (error) {
       console.error('Get review results error:', error.message);
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+  
+  /**
+   * @route   DELETE api/reviews/templates/:id
+   * @desc    Delete a review template
+   * @access  Private (Instructor only)
+   */
+  app.delete('/api/reviews/templates/:id', [authenticateJWT, instructorAuth], async (req, res) => {
+    try {
+      const templateId = req.params.id;
+      // Check if template exists and belongs to instructor
+      const template = await new Promise((resolve, reject) => {
+        db.get('SELECT * FROM review_templates WHERE id = ?', [templateId], (err, row) => {
+          if (err) reject(err);
+          resolve(row);
+        });
+      });
+      if (!template) {
+        return res.status(404).json({ message: 'Template not found' });
+      }
+      if (template.instructor_id !== req.user.id) {
+        return res.status(403).json({ message: 'Not authorized' });
+      }
+      // Delete questions first
+      await new Promise((resolve, reject) => {
+        db.run('DELETE FROM questions WHERE template_id = ?', [templateId], function(err) {
+          if (err) reject(err);
+          resolve();
+        });
+      });
+      // Delete template
+      await new Promise((resolve, reject) => {
+        db.run('DELETE FROM review_templates WHERE id = ?', [templateId], function(err) {
+          if (err) reject(err);
+          resolve();
+        });
+      });
+      res.json({ message: 'Template deleted' });
+    } catch (error) {
+      console.error('Delete review template error:', error.message);
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+  
+  /**
+   * @route   PUT api/reviews/templates/:id
+   * @desc    Update a review template
+   * @access  Private (Instructor only)
+   */
+  app.put('/api/reviews/templates/:id', [authenticateJWT, instructorAuth], async (req, res) => {
+    try {
+      const templateId = req.params.id;
+      const { title, description, questions } = req.body;
+      // Check if template exists and belongs to instructor
+      const template = await new Promise((resolve, reject) => {
+        db.get('SELECT * FROM review_templates WHERE id = ?', [templateId], (err, row) => {
+          if (err) reject(err);
+          resolve(row);
+        });
+      });
+      if (!template) {
+        return res.status(404).json({ message: 'Template not found' });
+      }
+      if (template.instructor_id !== req.user.id) {
+        return res.status(403).json({ message: 'Not authorized' });
+      }
+      // Update template
+      await new Promise((resolve, reject) => {
+        db.run('UPDATE review_templates SET title = ?, description = ? WHERE id = ?', [title, description, templateId], function(err) {
+          if (err) reject(err);
+          resolve();
+        });
+      });
+      // Delete old questions
+      await new Promise((resolve, reject) => {
+        db.run('DELETE FROM questions WHERE template_id = ?', [templateId], function(err) {
+          if (err) reject(err);
+          resolve();
+        });
+      });
+      // Add new questions
+      for (let i = 0; i < questions.length; i++) {
+        const q = questions[i];
+        const optionsJson = q.options ? JSON.stringify(q.options) : null;
+        await new Promise((resolve, reject) => {
+          db.run('INSERT INTO questions (template_id, question_text, question_type, options, required, order_num) VALUES (?, ?, ?, ?, ?, ?)',
+            [templateId, q.text, q.type, optionsJson, q.required !== false, i + 1],
+            function(err) {
+              if (err) reject(err);
+              resolve();
+            }
+          );
+        });
+      }
+      res.json({ message: 'Template updated' });
+    } catch (error) {
+      console.error('Update review template error:', error.message);
       res.status(500).json({ message: 'Server error' });
     }
   });

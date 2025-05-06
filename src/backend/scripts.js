@@ -114,10 +114,30 @@ document.addEventListener('DOMContentLoaded', function () {
   // Student Dashboard Navigation
   document.getElementById('nav-student').addEventListener('click', function (event) {
       event.preventDefault();
-      document.querySelectorAll('section, form').forEach(el => {
-          el.style.display = 'none';
-      });
-      document.getElementById('student-dashboard').style.display = 'block';
+      // Decode JWT to check user role
+      const token = getToken();
+      let userRole = null;
+      if (token) {
+        try {
+          const base64Url = token.split('.')[1];
+          const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+          const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+          }).join(''));
+          const payload = JSON.parse(jsonPayload);
+          userRole = payload.role;
+        } catch (err) {
+          userRole = null;
+        }
+      }
+      if (userRole === 'student' || userRole === 'instructor') {
+        document.querySelectorAll('section, form').forEach(el => {
+            el.style.display = 'none';
+        });
+        document.getElementById('student-dashboard').style.display = 'block';
+      } else {
+        Swal.fire('Access Denied', 'You must be logged in as a student or faculty to access the student dashboard.', 'error');
+      }
   });
   // Faculty Manage Courses Navigation
   document.getElementById('btnManageCourses').addEventListener('click', function (event) {
